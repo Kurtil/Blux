@@ -138,7 +138,7 @@ export default class MainScene extends Phaser.Scene {
       this.player.anims.play("jump");
       // TODO play only if not already playing
       if (time - this.lastPlayedJumpTime > this.jumpSoundDelay) {
-        this.sound.play("playerJump", { volume: 0.2 });
+        this.sound.play("playerJump", { volume: 0.2, detune: Math.random() * 50 - 25 });
         this.lastPlayedJumpTime = time;
       }
     }
