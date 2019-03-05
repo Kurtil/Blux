@@ -19,9 +19,12 @@ export default class MainScene extends Phaser.Scene {
     });
     this.load.tilemapTiledJSON("map", "assets/tileMaps/tileMap01.json");
     this.load.audio("playerJump", "assets/sounds/jump.wav");
+    this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
   }
 
   create() {
+
+    this.sound.play('mainTheme', { volume: 0.1, loop: true });
 
     this.map = this.make.tilemap({ key: 'map' });
 
@@ -135,7 +138,7 @@ export default class MainScene extends Phaser.Scene {
       this.player.anims.play("jump");
       // TODO play only if not already playing
       if (time - this.lastPlayedJumpTime > this.jumpSoundDelay) {
-        this.sound.play("playerJump", { volume: 0.1 });
+        this.sound.play("playerJump", { volume: 0.2 });
         this.lastPlayedJumpTime = time;
       }
     }
@@ -153,8 +156,9 @@ export default class MainScene extends Phaser.Scene {
     if (this.player.x > this.map.width * this.map.tileWidth ||
       this.player.x < 0 ||
       this.player.y > this.map.height * this.map.tileHeight) {
-        this.scene.start('startMenuScene');
-      }
+      this.sound.stopAll();
+      this.scene.start('startMenuScene');
+    }
 
   }
 
