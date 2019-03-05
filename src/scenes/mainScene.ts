@@ -1,8 +1,9 @@
 export default class MainScene extends Phaser.Scene {
   player: Phaser.Physics.Arcade.Sprite;
   cursors: Phaser.Input.Keyboard.CursorKeys;
-
   speed = 140;
+  jumpSoundDelay = 100;
+  lastPlayedJumpTime = 0;
 
   constructor() {
     super({
@@ -16,6 +17,7 @@ export default class MainScene extends Phaser.Scene {
       frameHeight: 16
     });
     this.load.tilemapTiledJSON("map", "assets/tileMaps/tileMap01.json");
+    this.load.audio("playerJump", "assets/sounds/jump.wav");
   }
 
   create() {
@@ -43,7 +45,7 @@ export default class MainScene extends Phaser.Scene {
     // dynamic by default
     this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y - 16, "spriteSheet")
       .setSize(12, 16);
-      //.setOffset(0, 45);
+    //.setOffset(0, 45);
 
     // this.player.setCollideWorldBounds(true);
 
@@ -101,12 +103,14 @@ export default class MainScene extends Phaser.Scene {
       repeat: 0
     });
 
+    this.sound.add("playerJump");
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.setDebugGraphics.call(this, ground);
   }
 
-  update() {
+  update(time) {
     this.player.setVelocityX(0);
     // Controlls
     // TODO implement state machine for player controls and animations
@@ -128,6 +132,11 @@ export default class MainScene extends Phaser.Scene {
     if (this.cursors.up.isDown && this.player.body.blocked.down) {
       this.player.setVelocityY(-200);
       this.player.anims.play("jump");
+      // TODO play only if not already playing
+      if (time - this.lastPlayedJumpTime > this.jumpSoundDelay ) {
+        this.sound.play("playerJump", { volume: 0.1 });
+        this.lastPlayedJumpTime = time;
+      }
     }
 
     // Fly
@@ -141,34 +150,34 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private setDebugGraphics(ground) {
-            // Help text that has a "fixed" position on the screen
-            // TODO make this displayer :P
-            this.add
-            .text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
-                font: "18px monospace",
-                fill: "#000000",
-                padding: { x: 20, y: 10 },
-                backgroundColor: "#ffffff"
-            })
-            .setScrollFactor(0)
-            .setDepth(30);
+    // Help text that has a "fixed" position on the screen
+    // TODO make this displayer :P
+    this.add
+      .text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
+        font: "18px monospace",
+        fill: "#000000",
+        padding: { x: 20, y: 10 },
+        backgroundColor: "#ffffff"
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
 
-        // DEBUG RENDERING
-        // Debug graphics
-        this.input.keyboard.once("keydown_D", event => {
-            // Turn on physics debugging to show player's hitbox
-            this.physics.world.createDebugGraphic();
+    // DEBUG RENDERING
+    // Debug graphics
+    this.input.keyboard.once("keydown_D", event => {
+      // Turn on physics debugging to show player's hitbox
+      this.physics.world.createDebugGraphic();
 
-            // Create worldLayer collision graphic above the player, but below the help text
-            const graphics = this.add
-                .graphics()
-                .setAlpha(0.75)
-                .setDepth(20);
-            ground.renderDebug(graphics, {
-                tileColor: null, // Color of non-colliding tiles
-                collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-                faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-            });
-        });
+      // Create worldLayer collision graphic above the player, but below the help text
+      const graphics = this.add
+        .graphics()
+        .setAlpha(0.75)
+        .setDepth(20);
+      ground.renderDebug(graphics, {
+        tileColor: null, // Color of non-colliding tiles
+        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+        faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+      });
+    });
   }
 }
