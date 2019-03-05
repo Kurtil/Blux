@@ -4,6 +4,7 @@ export default class MainScene extends Phaser.Scene {
   speed = 140;
   jumpSoundDelay = 100;
   lastPlayedJumpTime = 0;
+  map: Phaser.Tilemaps.Tilemap;
 
   constructor() {
     super({
@@ -22,14 +23,14 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
 
-    const map = this.make.tilemap({ key: 'map' });
+    this.map = this.make.tilemap({ key: 'map' });
 
-    const tileset = map.addTilesetImage("BluxSpriteSheet", "spriteSheet");
+    const tileset = this.map.addTilesetImage("BluxSpriteSheet", "spriteSheet");
 
-    const background = map.createStaticLayer("background", tileset);
-    const ground = map.createStaticLayer("ground", tileset);
-    const foreground01 = map.createStaticLayer("foreground01", tileset);
-    const foreground02 = map.createStaticLayer("foreground02", tileset);
+    const background = this.map.createStaticLayer("background", tileset);
+    const ground = this.map.createStaticLayer("ground", tileset);
+    const foreground01 = this.map.createStaticLayer("foreground01", tileset);
+    const foreground02 = this.map.createStaticLayer("foreground02", tileset);
 
     foreground01.setScrollFactor(0.9, 0.95).setDepth(10);
     foreground02.setScrollFactor(0.8, 0.95).setDepth(10);
@@ -37,7 +38,7 @@ export default class MainScene extends Phaser.Scene {
     // remember that you can play with properties like this :
     ground.setCollisionByProperty({ collides: true });
 
-    const spawnPoint: any = map.findObject("objects", obj => obj.name === "spawn");
+    const spawnPoint: any = this.map.findObject("objects", obj => obj.name === "spawn");
 
     this.cameras.main.setZoom(3);
 
@@ -60,7 +61,7 @@ export default class MainScene extends Phaser.Scene {
     ground.setCollision(0)
     this.physics.add.collider(this.player, ground);
 
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player);
 
     // Animations
@@ -133,7 +134,7 @@ export default class MainScene extends Phaser.Scene {
       this.player.setVelocityY(-200);
       this.player.anims.play("jump");
       // TODO play only if not already playing
-      if (time - this.lastPlayedJumpTime > this.jumpSoundDelay ) {
+      if (time - this.lastPlayedJumpTime > this.jumpSoundDelay) {
         this.sound.play("playerJump", { volume: 0.1 });
         this.lastPlayedJumpTime = time;
       }
@@ -147,6 +148,14 @@ export default class MainScene extends Phaser.Scene {
         this.player.anims.play('land', true)
       }
     }
+
+    // DEAD Logic (every out of map excepted the top)
+    if (this.player.x > this.map.width * this.map.tileWidth ||
+      this.player.x < 0 ||
+      this.player.y > this.map.height * this.map.tileHeight) {
+        this.scene.start('startMenuScene');
+      }
+
   }
 
   private setDebugGraphics(ground) {
