@@ -156,8 +156,15 @@ export default class MainScene extends Phaser.Scene {
     if (this.player.x > this.map.width * this.map.tileWidth ||
       this.player.x < 0 ||
       this.player.y > this.map.height * this.map.tileHeight) {
-      this.sound.stopAll();
-      this.scene.start('startMenuScene');
+
+      const cam = this.cameras.main;
+      cam.shake(250, 0.005);
+      cam.fade(250, 30, 0, 0);
+
+      cam.once("camerafadeoutcomplete", () => {
+        this.sound.stopAll();
+        this.scene.start('startMenuScene');
+      });
     }
 
   }
