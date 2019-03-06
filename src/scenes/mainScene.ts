@@ -18,6 +18,7 @@ export default class MainScene extends Phaser.Scene {
     });
     this.load.tilemapTiledJSON("map", "assets/tileMaps/tileMap01.json");
     this.load.audio("playerJump", "assets/sounds/jump.wav");
+    this.load.audio("playerDie", "assets/sounds/die.wav");
     this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
   }
 
@@ -26,6 +27,7 @@ export default class MainScene extends Phaser.Scene {
     // Sound management
     this.sound.play('mainTheme', { volume: 0.1, loop: true });
     this.sound.add("playerJump");
+    this.sound.add("playerDie");
 
     // Map management
     this.map = this.make.tilemap({ key: 'map' });
