@@ -1,11 +1,23 @@
 export default class StartMenuScene extends Phaser.Scene {
+
+    keySpace: Phaser.Input.Keyboard.Key;
+
     constructor() {
         super({
             key: "startMenuScene"
         });
     }
 
-    keySpace: Phaser.Input.Keyboard.Key;
+    preload() {
+        this.load.spritesheet("spriteSheet", "assets/spriteSheets/BluxSpriteSheet.png", {
+            frameWidth: 16,
+            frameHeight: 16
+        });
+        this.load.tilemapTiledJSON("map", "assets/tileMaps/tileMap01.json");
+        this.load.audio("playerJump", "assets/sounds/jump.wav");
+        this.load.audio("playerDie", "assets/sounds/die.wav");
+        this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
+    }
 
     create() {
         this.add

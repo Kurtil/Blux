@@ -11,17 +11,6 @@ export default class MainScene extends Phaser.Scene {
     });
   }
 
-  preload() {
-    this.load.spritesheet("spriteSheet", "assets/spriteSheets/BluxSpriteSheet.png", {
-      frameWidth: 16,
-      frameHeight: 16
-    });
-    this.load.tilemapTiledJSON("map", "assets/tileMaps/tileMap01.json");
-    this.load.audio("playerJump", "assets/sounds/jump.wav");
-    this.load.audio("playerDie", "assets/sounds/die.wav");
-    this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
-  }
-
   create() {
 
     // Sound management
