@@ -14,11 +14,19 @@ export default class Player extends Entity {
         this.setData("speed", 140);
         this.setData('isDead', false);
 
-        this.createAnimations();
-
         // this.setBounce(0.2);
 
+        // TODO understand why the following cannot be in the create function
         this.cursors = this.scene.input.keyboard.createCursorKeys();
+
+        // Animations management
+        this.createAnimations();
+        this.on('animationcomplete-dye', (animation, frame) => {
+            if (frame.isLast) this.setData('isDead', true);
+        });
+        this.on('animationupdate-attack', (animation, frame) => {
+            if (frame.textureFrame === 26) this.scene.sound.play("playerAttack", { volume: 0.1, detune: Math.random() * 50 - 25 });;
+        });
     }
 
     update(time: number) {
@@ -67,10 +75,6 @@ export default class Player extends Entity {
             this.y > (<MainScene>this.scene).map.height * (<MainScene>this.scene).map.tileHeight) {
             this.setData('isDead', true);
         }
-
-        this.on('animationcomplete-dye', (animation, frame) => {
-            if (frame.isLast) this.setData('isDead', true);
-        });
     }
 
     private createAnimations() {

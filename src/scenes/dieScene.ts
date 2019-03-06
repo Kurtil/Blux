@@ -24,7 +24,7 @@ export default class DieScene extends Phaser.Scene {
         this.time.addEvent({ delay: 2000, callback: () => this.scene.start(this.nextScene) });
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-        this.sound.play("playerDie", { volume: 0.05 });
+        this.sound.play("playerDie", { volume: 0.2 });
     }
 
     update() {

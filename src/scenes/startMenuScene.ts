@@ -16,6 +16,7 @@ export default class StartMenuScene extends Phaser.Scene {
         this.load.tilemapTiledJSON("map", "assets/tileMaps/tileMap01.json");
         this.load.audio("playerJump", "assets/sounds/jump.wav");
         this.load.audio("playerDie", "assets/sounds/die.wav");
+        this.load.audio("playerAttack", "assets/sounds/attack.wav");
         this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
     }
 

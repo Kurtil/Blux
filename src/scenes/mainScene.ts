@@ -17,6 +17,7 @@ export default class MainScene extends Phaser.Scene {
     this.sound.play('mainTheme', { volume: 0.1, loop: true });
     this.sound.add("playerJump");
     this.sound.add("playerDie");
+    this.sound.add("playerAttack");
 
     // Map management
     this.map = this.make.tilemap({ key: 'map' });
@@ -47,6 +48,11 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
 
     this.setDebugGraphics.call(this, ground);
+
+    this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.sound.stopAll();
+      this.scene.start('dieScene');
+    });
   }
 
   update(time) {
@@ -56,11 +62,6 @@ export default class MainScene extends Phaser.Scene {
       const cam = this.cameras.main;
       cam.shake(250, 0.005);
       cam.fade(250, 30, 0, 0);
-
-      cam.once("camerafadeoutcomplete", () => {
-        this.sound.stopAll();
-        this.scene.start('dieScene');
-      });
     }
   }
 
