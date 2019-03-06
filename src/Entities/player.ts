@@ -25,37 +25,39 @@ export default class Player extends Entity {
         this.setVelocityX(0);
         // Controlls
         // TODO implement state machine for player controls and animations
-        if (this.cursors.left.isDown) {
-            this.setVelocityX(-this.getData('speed'));
-            this.setFlipX(true);
-            this.anims.play("walk", true);
-        } else if (this.cursors.right.isDown) {
-            this.setVelocityX(this.getData('speed'));
-            this.setFlipX(false);
-            this.anims.play("walk", true);
-        } else if (this.cursors.down.isDown) {
-            this.anims.play('dye', true);
-        } else if (this.cursors.space.isDown) {
-            this.anims.play('attack', true);
-        } else {
-            this.anims.play("idle", true);
-        }
-        if (this.cursors.up.isDown && this.body.blocked.down) {
-            this.setVelocityY(-200);
-            this.anims.play("jump");
-            // TODO play only if not already playing
-            if (time - this.lastPlayedJumpTime > this.jumpSoundDelay) {
-                this.scene.sound.play("playerJump", { volume: 0.2, detune: Math.random() * 50 - 25 });
-                this.lastPlayedJumpTime = time;
-            }
-        }
-
-        // Fly
-        if (!this.body.blocked.down) {
-            if (this.body.velocity.y <= 0) {
-                this.anims.play('jump', true);
+        if (this.getData('isDead') === false) {
+            if (this.cursors.left.isDown) {
+                this.setVelocityX(-this.getData('speed'));
+                this.setFlipX(true);
+                this.anims.play("walk", true);
+            } else if (this.cursors.right.isDown) {
+                this.setVelocityX(this.getData('speed'));
+                this.setFlipX(false);
+                this.anims.play("walk", true);
+            } else if (this.cursors.down.isDown) {
+                this.anims.play('dye', true);
+            } else if (this.cursors.space.isDown) {
+                this.anims.play('attack', true);
             } else {
-                this.anims.play('land', true)
+                this.anims.play("idle", true);
+            }
+            if (this.cursors.up.isDown && this.body.blocked.down) {
+                this.setVelocityY(-200);
+                this.anims.play("jump");
+                // TODO play only if not already playing
+                if (time - this.lastPlayedJumpTime > this.jumpSoundDelay) {
+                    this.scene.sound.play("playerJump", { volume: 0.2, detune: Math.random() * 50 - 25 });
+                    this.lastPlayedJumpTime = time;
+                }
+            }
+
+            // Fly
+            if (!this.body.blocked.down) {
+                if (this.body.velocity.y <= 0) {
+                    this.anims.play('jump', true);
+                } else {
+                    this.anims.play('land', true)
+                }
             }
         }
 
@@ -65,6 +67,10 @@ export default class Player extends Entity {
             this.y > (<MainScene>this.scene).map.height * (<MainScene>this.scene).map.tileHeight) {
             this.setData('isDead', true);
         }
+
+        this.on('animationcomplete-dye', (animation, frame) => {
+            if (frame.isLast) this.setData('isDead', true);
+        });
     }
 
     private createAnimations() {
