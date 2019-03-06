@@ -163,7 +163,7 @@ export default class MainScene extends Phaser.Scene {
 
       cam.once("camerafadeoutcomplete", () => {
         this.sound.stopAll();
-        this.scene.start('startMenuScene');
+        this.scene.start('dieScene');
       });
     }
 
