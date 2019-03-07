@@ -14,7 +14,7 @@ export default class MainScene extends Phaser.Scene {
   create() {
 
     // Sound management
-    this.sound.play('mainTheme', { volume: 0.1, loop: true });
+    this.sound.play('mainTheme', { volume: 0.05, loop: true });
     this.sound.add("playerJump");
     this.sound.add("playerDie");
     this.sound.add("playerAttack");

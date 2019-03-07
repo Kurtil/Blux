@@ -26,7 +26,7 @@ export default class Player extends Entity {
             if (frame.isLast) this.setData('isDead', true);
         });
         this.on('animationupdate-attack', (animation, frame) => {
-            if (frame.textureFrame === 26) this.scene.sound.play("playerAttack", { volume: 0.1, detune: Math.random() * 50 - 25 });;
+            if (frame.textureFrame === 26) this.scene.sound.play("playerAttack", { volume: 0.2, detune: Math.random() * 50 - 25 });;
         });
     }
 
