@@ -36,11 +36,27 @@ export default class MainScene extends Phaser.Scene {
 
     const spawnPoint: any = this.map.findObject("objects", obj => obj.name === "spawn");
 
+    // Gems management
+    const gems = this.generateGems();
+
+    this.physics.add.collider(gems, ground);
+
     // create player
-    this.player = new Player(this, spawnPoint.x, spawnPoint.y, "Player");
+    this.player = new Player(this, spawnPoint.x, spawnPoint.y, "spriteSheet");
 
     // add collider between player and the platforms group
     this.physics.add.collider(this.player, ground);
+    // add collider between player and gems
+    this.physics.add.overlap(this.player, gems, (player, gem) => {
+      gem.destroy();
+      if ((<Phaser.GameObjects.Sprite>gem).scaleX === 2) {
+        // darker sound for big gem
+        // TODO find a better way to filter
+        this.sound.play('gemPickedUp', { volume: 0.2, detune: -600 });
+      } else {
+        this.sound.play('gemPickedUp', { volume: 0.2 });
+      }
+    });
 
     // Camera management
     this.cameras.main.setZoom(3);
@@ -63,6 +79,32 @@ export default class MainScene extends Phaser.Scene {
       cam.shake(250, 0.005);
       cam.fade(250, 30, 0, 0);
     }
+  }
+
+  private generateGems() {
+    const gems = this.map.createFromObjects('objects', 50, { key: 'spriteSheet', frame: 49 });
+
+    this.anims.create({
+      key: "gem",
+      frames: this.anims.generateFrameNumbers("spriteSheet", { start: 49, end: 55 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.play('gem', gems);
+
+    gems.forEach(gem => {
+      this.physics.world.enableBody(gem);
+    });
+
+    // createFromObject do not get the scale 2 into account... TODO : chek why and pull request ? :)
+    gems.filter(gem => gem.scaleX === 2).forEach(gem => {
+      gem.setData('big', true);
+      (<Phaser.Physics.Arcade.Body>gem.body).height = 32;
+      (<Phaser.Physics.Arcade.Body>gem.body).width = 32;
+    });
+
+    return gems;
   }
 
   private setDebugGraphics(ground) {

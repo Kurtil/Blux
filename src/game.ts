@@ -15,7 +15,11 @@ const config: GameConfig | any  = {
             debug: false
         }
     },
-    scene: [StartMenuScene, MainScene, DieScene],
+    scene: [
+        StartMenuScene,
+        MainScene,
+        DieScene,
+    ],
 };
 
 const game: any = new Phaser.Game(config);
