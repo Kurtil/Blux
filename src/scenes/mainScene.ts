@@ -58,10 +58,13 @@ export default class MainScene extends Phaser.Scene {
         this.sound.play('gemPickedUp', { volume: 0.2 });
       }
       this.player.setData('score', this.player.getData('score') + 1);
+      this.events.emit('gem-picked');
     });
 
     // Camera management
     this.cameras.main.setZoom(3);
+    // this.cameras.main.centerOn(0, 0);
+
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player);
 
@@ -72,7 +75,14 @@ export default class MainScene extends Phaser.Scene {
       this.sound.stopAll();
       this.scene.start('dieScene');
     });
+
+    const hud = this.displayHUD();
+
+    this.events.on('gem-picked', () => {
+      hud.setText(`${this.player.getData('score')} / 10 gems`);
+    });
   }
+
 
   update(time) {
     this.player.update(time);
@@ -87,6 +97,17 @@ export default class MainScene extends Phaser.Scene {
       cam.shake(250, 0.005);
       cam.fade(250, 30, 0, 0);
     }
+  }
+
+  private displayHUD(): Phaser.GameObjects.Text {
+    // TODO due to the camera zoom, the position seems weird... improve it with wisdom :P
+    const hud = this.add.text(270, 203, '0 / 10 gems', {
+      font: "8px monospace bold",
+      fill: "#ffffff",
+    })
+      .setDepth(30)
+      .setScrollFactor(0);
+    return hud;
   }
 
   private generateGems() {
