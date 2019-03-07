@@ -13,6 +13,7 @@ export default class Player extends Entity {
         this.setSize(12, 16).setOffset(2, 0);
         this.setData("speed", 140);
         this.setData('isDead', false);
+        this.setData('score', 0);
 
         // this.setBounce(0.2);
 

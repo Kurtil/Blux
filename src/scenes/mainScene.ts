@@ -18,6 +18,7 @@ export default class MainScene extends Phaser.Scene {
     this.sound.add("playerJump");
     this.sound.add("playerDie");
     this.sound.add("playerAttack");
+    this.sound.add("victory", { volume: 0.1 });
 
     // Map management
     this.map = this.make.tilemap({ key: 'map' });
@@ -56,6 +57,7 @@ export default class MainScene extends Phaser.Scene {
       } else {
         this.sound.play('gemPickedUp', { volume: 0.2 });
       }
+      this.player.setData('score', this.player.getData('score') + 1);
     });
 
     // Camera management
@@ -65,6 +67,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.setDebugGraphics.call(this, ground);
 
+    // TODO camera fadeout complete will always lead to death... fix it
     this.cameras.main.once("camerafadeoutcomplete", () => {
       this.sound.stopAll();
       this.scene.start('dieScene');
@@ -73,6 +76,11 @@ export default class MainScene extends Phaser.Scene {
 
   update(time) {
     this.player.update(time);
+
+    if (this.player.getData('score') === 10) {
+      this.sound.stopAll();
+      this.scene.start('winScene');
+    }
 
     if (this.player.getData('isDead') === true) {
       const cam = this.cameras.main;
