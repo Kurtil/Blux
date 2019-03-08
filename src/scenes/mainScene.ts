@@ -40,8 +40,7 @@ export default class MainScene extends Phaser.Scene {
 
     // Enable HUD
     this.scene.launch('mainSceneHUD'); // score may be passed here as object : { playerScore: X }
-    this.events.on('shutdown', () => {
-      this.events.removeListener('shutdown');
+    this.events.once('shutdown', () => {
       this.scene.stop('mainSceneHUD');
     });
 
