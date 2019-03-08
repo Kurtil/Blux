@@ -1,5 +1,6 @@
 import Player from "../Entities/player";
 import MainSceneHUD from "./mainSceneHUD";
+import Enemy from "../Entities/enemy";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -44,6 +45,11 @@ export default class MainScene extends Phaser.Scene {
       this.scene.stop('mainSceneHUD');
     });
 
+    // Enemy management
+    const enemies = this.generateEnemies();
+
+    this.physics.add.collider(enemies, ground);
+
     // Gems management
     const gems = this.generateGems();
 
@@ -55,6 +61,10 @@ export default class MainScene extends Phaser.Scene {
     // add collider between player and the platforms group
     this.physics.add.collider(this.player, ground);
     // add collider between player and gems
+    this.physics.add.collider(this.player, enemies, (player, enemy) => {
+      this.player.setData('isDead', true);
+    });
+
     this.physics.add.overlap(this.player, gems, (player, gem) => {
       gem.destroy();
       if ((<Phaser.GameObjects.Sprite>gem).scaleX === 2) {
@@ -133,6 +143,29 @@ export default class MainScene extends Phaser.Scene {
     });
 
     return gems;
+  }
+
+  private generateEnemies() {
+    // const enemies = this.map.createFromObjects('enemies', 61, { key: 'spriteSheet', frame: 60 });
+
+    const enemies = this.map.getObjectLayer('enemies').objects.map((enemy: any) => {
+      debugger
+      return new Enemy(this, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2, 'spriteSheet');
+    });
+    this.anims.create({
+      key: "enemy",
+      frames: this.anims.generateFrameNumbers("spriteSheet", { start: 60, end: 65 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.play('enemy', enemies);
+
+    enemies.forEach(enemy => {
+      this.physics.world.enableBody(enemy);
+    });
+
+    return enemies;
   }
 
   private setDebugGraphics(ground) {
