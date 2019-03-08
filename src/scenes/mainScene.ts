@@ -6,6 +6,8 @@ export default class MainScene extends Phaser.Scene {
 
   player: Player;
   map: Phaser.Tilemaps.Tilemap;
+  enemies: Phaser.GameObjects.Sprite[];
+  enemiesFireBalls: Phaser.GameObjects.Group = null;
 
   constructor() {
     super({
@@ -46,9 +48,18 @@ export default class MainScene extends Phaser.Scene {
     });
 
     // Enemy management
-    const enemies = this.generateEnemies();
+    this.enemiesFireBalls = this.add.group();
+    this.enemies = this.generateEnemies();
 
-    this.physics.add.collider(enemies, ground);
+    this.anims.create({
+      key: "fireBall",
+      frames: this.anims.generateFrameNumbers("spriteSheet", { start: 76, end: 79 }),
+      frameRate: 24,
+      repeat: -1,
+    });
+
+    this.physics.add.collider(this.enemies, ground);
+    this.physics.add.collider(this.enemiesFireBalls, ground, fireball => fireball.destroy());
 
     // Gems management
     const gems = this.generateGems();
@@ -60,8 +71,12 @@ export default class MainScene extends Phaser.Scene {
 
     // add collider between player and the platforms group
     this.physics.add.collider(this.player, ground);
-    // add collider between player and gems
-    this.physics.add.collider(this.player, enemies, (player, enemy) => {
+
+    this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
+      this.player.setData('isDead', true);
+    });
+
+    this.physics.add.collider(this.player, this.enemiesFireBalls, (player, enemiesFireBall) => {
       this.player.setData('isDead', true);
     });
 
@@ -95,6 +110,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update(time) {
+    this.enemies.forEach(enemy => enemy.update(time));
     this.player.update(time);
 
     if (this.player.getData('score') === 10) {
