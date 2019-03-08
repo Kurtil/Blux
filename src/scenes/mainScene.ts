@@ -1,4 +1,5 @@
 import Player from "../Entities/player";
+import MainSceneHUD from "./mainSceneHUD";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -37,6 +38,13 @@ export default class MainScene extends Phaser.Scene {
 
     const spawnPoint: any = this.map.findObject("objects", obj => obj.name === "spawn");
 
+    // Enable HUD
+    this.scene.launch('mainSceneHUD'); // score may be passed here as object : { playerScore: X }
+    this.events.on('shutdown', () => {
+      this.events.removeListener('shutdown');
+      this.scene.stop('mainSceneHUD');
+    });
+
     // Gems management
     const gems = this.generateGems();
 
@@ -58,7 +66,7 @@ export default class MainScene extends Phaser.Scene {
         this.sound.play('gemPickedUp', { volume: 0.2 });
       }
       this.player.setData('score', this.player.getData('score') + 1);
-      this.events.emit('gem-picked');
+      (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerScore(this.player.getData('score'));
     });
 
     // Camera management
@@ -74,13 +82,6 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.once("camerafadeoutcomplete", () => {
       this.sound.stopAll();
       this.scene.start('dieScene');
-    });
-
-    // Enable HUD
-    this.scene.launch('mainSceneHUD');
-    this.events.on('shutdown', () => {
-      this.events.removeListener('shutdown');
-      this.scene.stop('mainSceneHUD');
     });
   }
 
