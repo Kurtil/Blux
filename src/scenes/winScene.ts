@@ -24,7 +24,7 @@ export default class WinScene extends Phaser.Scene {
         this.time.addEvent({ delay: 2000, callback: () => this.scene.start(this.nextScene) });
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-        this.sound.play("victory", { volume: 0.2 });
+        this.sound.play("victory", { volume: 0.1 });
     }
 
     update() {

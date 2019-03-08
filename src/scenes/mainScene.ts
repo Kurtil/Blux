@@ -19,7 +19,7 @@ export default class MainScene extends Phaser.Scene {
     this.sound.add("playerJump");
     this.sound.add("playerDie");
     this.sound.add("playerAttack");
-    this.sound.add("victory", { volume: 0.1 });
+    this.sound.add("victory");
 
     // Map management
     this.map = this.make.tilemap({ key: 'map' });
