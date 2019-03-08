@@ -11,7 +11,7 @@ export default class Gem extends Entity {
     createAnimations(): any {
         this.scene.anims.create({
             key: "gem",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 49, end: 55 }),
+            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 80, end: 86 }),
             frameRate: 10,
             repeat: -1,
         });

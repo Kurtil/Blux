@@ -36,8 +36,8 @@ export default class MainScene extends Phaser.Scene {
 
     ground.setCollisionByProperty({ collides: true });
 
-    const spawnPoint: any = this.map.findObject("objects", obj => obj.name === "spawn");
-
+    const spawnPoint: any = this.map.findObject("spawn", obj => obj.name === "spawn");
+    debugger
     // Enable HUD
     this.scene.launch('mainSceneHUD'); // score may be passed here as object : { playerScore: X }
     this.events.once('shutdown', () => {
@@ -111,11 +111,11 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private generateGems() {
-    const gems = this.map.createFromObjects('objects', 50, { key: 'spriteSheet', frame: 49 });
+    const gems = this.map.createFromObjects('gems', 81, { key: 'spriteSheet', frame: 80 });
 
     this.anims.create({
       key: "gem",
-      frames: this.anims.generateFrameNumbers("spriteSheet", { start: 49, end: 55 }),
+      frames: this.anims.generateFrameNumbers("spriteSheet", { start: 80, end: 86 }),
       frameRate: 10,
       repeat: -1,
     });
@@ -129,8 +129,7 @@ export default class MainScene extends Phaser.Scene {
     // createFromObject do not get the scale 2 into account... TODO : chek why and pull request ? :)
     gems.filter(gem => gem.scaleX === 2).forEach(gem => {
       gem.setData('big', true);
-      (<Phaser.Physics.Arcade.Body>gem.body).height = 32;
-      (<Phaser.Physics.Arcade.Body>gem.body).width = 32;
+      (gem.body as Phaser.Physics.Arcade.Body).setSize();
     });
 
     return gems;

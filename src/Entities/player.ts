@@ -22,11 +22,11 @@ export default class Player extends Entity {
 
         // Animations management
         this.createAnimations();
-        this.on('animationcomplete-dye', (animation, frame) => {
+        this.on('animationcomplete-die', (animation, frame) => {
             if (frame.isLast) this.setData('isDead', true);
         });
         this.on('animationupdate-attack', (animation, frame) => {
-            if (frame.textureFrame === 26) this.scene.sound.play("playerAttack", { volume: 0.2, detune: Math.random() * 50 - 25 });;
+            if (frame.textureFrame === 32) this.scene.sound.play("playerAttack", { volume: 0.2, detune: Math.random() * 50 - 25 });;
         });
     }
 
@@ -44,7 +44,7 @@ export default class Player extends Entity {
                 this.setFlipX(false);
                 this.anims.play("walk", true);
             } else if (this.cursors.down.isDown) {
-                this.anims.play('dye', true);
+                this.anims.play('die', true);
             } else if (this.cursors.space.isDown) {
                 this.anims.play('attack', true);
             } else {
@@ -88,28 +88,28 @@ export default class Player extends Entity {
         });
         this.scene.anims.create({
             key: "idle",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 47, end: 48 }),
+            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 12, end: 13 }),
             frameRate: 2
         });
         this.scene.anims.create({
             key: "jump",
-            frames: [{ key: "spriteSheet", frame: 32 }],
+            frames: [{ key: "spriteSheet", frame: 15 }],
             frameRate: 20
         });
         this.scene.anims.create({
             key: "land",
-            frames: [{ key: "spriteSheet", frame: 34 }],
+            frames: [{ key: "spriteSheet", frame: 14 }],
             frameRate: 20
         });
         this.scene.anims.create({
             key: "attack",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 14, end: 30 }),
+            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 20, end: 36 }),
             frameRate: 24,
             repeat: 0
         });
         this.scene.anims.create({
-            key: "dye",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 35, end: 45 }),
+            key: "die",
+            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 40, end: 50 }),
             frameRate: 24,
             repeat: 0
         });
