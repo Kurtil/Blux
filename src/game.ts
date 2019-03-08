@@ -3,8 +3,9 @@ import StartMenuScene from './scenes/startMenuScene';
 import MainScene from './scenes/mainScene';
 import DieScene from './scenes/dieScene';
 import WinScene from './scenes/winScene';
+import MainSceneHUD from './scenes/mainSceneHUD';
 
-const config: GameConfig | any  = {
+const config: GameConfig | any = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
@@ -19,6 +20,7 @@ const config: GameConfig | any  = {
     scene: [
         StartMenuScene,
         MainScene,
+        MainSceneHUD,
         DieScene,
         WinScene,
     ],

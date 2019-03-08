@@ -76,13 +76,13 @@ export default class MainScene extends Phaser.Scene {
       this.scene.start('dieScene');
     });
 
-    const hud = this.displayHUD();
-
-    this.events.on('gem-picked', () => {
-      hud.setText(`${this.player.getData('score')} / 10 gems`);
+    // Enable HUD
+    this.scene.launch('mainSceneHUD');
+    this.events.on('shutdown', () => {
+      this.events.removeListener('shutdown');
+      this.scene.stop('mainSceneHUD');
     });
   }
-
 
   update(time) {
     this.player.update(time);
@@ -139,15 +139,15 @@ export default class MainScene extends Phaser.Scene {
   private setDebugGraphics(ground) {
     // Help text that has a "fixed" position on the screen
     // TODO make this displayer :P
-    this.add
-      .text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
-        font: "18px monospace",
-        fill: "#000000",
-        padding: { x: 20, y: 10 },
-        backgroundColor: "#ffffff"
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
+    // this.add
+    //   .text(16, 16, 'Arrow keys to move\nPress "D" to show hitboxes', {
+    //     font: "18px monospace",
+    //     fill: "#000000",
+    //     padding: { x: 20, y: 10 },
+    //     backgroundColor: "#ffffff"
+    //   })
+    //   .setScrollFactor(0)
+    //   .setDepth(30);
 
     // DEBUG RENDERING
     // Debug graphics
