@@ -4,10 +4,11 @@ import Enemy from "../Entities/enemy";
 
 export default class MainScene extends Phaser.Scene {
 
-  player: Player;
-  map: Phaser.Tilemaps.Tilemap;
-  enemies: Phaser.GameObjects.Sprite[];
+  player: Player = null;
+  map: Phaser.Tilemaps.Tilemap = null;
+  enemies: Phaser.GameObjects.Sprite[] = null;
   enemiesFireBalls: Phaser.GameObjects.Group = null;
+  ground: Phaser.Tilemaps.StaticTilemapLayer = null;
 
   constructor() {
     super({
@@ -30,17 +31,16 @@ export default class MainScene extends Phaser.Scene {
     const tileset = this.map.addTilesetImage("BluxSpriteSheet", "spriteSheet");
 
     const background = this.map.createStaticLayer("background", tileset);
-    const ground = this.map.createStaticLayer("ground", tileset);
+    this.ground = this.map.createStaticLayer("ground", tileset);
     const foreground01 = this.map.createStaticLayer("foreground01", tileset);
     const foreground02 = this.map.createStaticLayer("foreground02", tileset);
 
     foreground01.setScrollFactor(0.9, 0.95).setDepth(10);
     foreground02.setScrollFactor(0.8, 0.95).setDepth(10);
 
-    ground.setCollisionByProperty({ collides: true });
+    this.ground.setCollisionByProperty({ collides: true });
 
     const spawnPoint: any = this.map.findObject("spawn", obj => obj.name === "spawn");
-    debugger
     // Enable HUD
     this.scene.launch('mainSceneHUD'); // score may be passed here as object : { playerScore: X }
     this.events.once('shutdown', () => {
@@ -58,19 +58,19 @@ export default class MainScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    this.physics.add.collider(this.enemies, ground);
-    this.physics.add.collider(this.enemiesFireBalls, ground, fireball => fireball.destroy());
+    this.physics.add.collider(this.enemies, this.ground);
+    this.physics.add.collider(this.enemiesFireBalls, this.ground, fireball => fireball.destroy());
 
     // Gems management
     const gems = this.generateGems();
 
-    this.physics.add.collider(gems, ground);
+    this.physics.add.collider(gems, this.ground);
 
     // create player
     this.player = new Player(this, spawnPoint.x, spawnPoint.y, "spriteSheet");
 
     // add collider between player and the platforms group
-    this.physics.add.collider(this.player, ground);
+    this.physics.add.collider(this.player, this.ground);
 
     this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
       this.player.setData('isDead', true);
@@ -100,7 +100,7 @@ export default class MainScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player);
 
-    this.setDebugGraphics.call(this, ground);
+    this.setDebugGraphics.call(this, this.ground);
 
     // TODO camera fadeout complete will always lead to death... fix it
     this.cameras.main.once("camerafadeoutcomplete", () => {
@@ -165,7 +165,6 @@ export default class MainScene extends Phaser.Scene {
     // const enemies = this.map.createFromObjects('enemies', 61, { key: 'spriteSheet', frame: 60 });
 
     const enemies = this.map.getObjectLayer('enemies').objects.map((enemy: any) => {
-      debugger
       return new Enemy(this, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2, 'spriteSheet');
     });
     this.anims.create({
