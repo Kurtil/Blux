@@ -1,5 +1,3 @@
-import MainScene from "./mainScene";
-
 export default class MainSceneHUD extends Phaser.Scene {
 
     infos: Phaser.GameObjects.Text = null;

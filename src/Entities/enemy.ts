@@ -2,19 +2,26 @@ import Entity from "./entity";
 import MainScene from "../scenes/mainScene";
 import FireBall from "./fireBall";
 import Player from "./player";
+import EnemyFactory from "../utils/enemyFactory";
 
 export default class Enemy extends Entity {
 
+    /**
+     * The group that must contains enemy shots
+     */
+    shotGroup: Phaser.GameObjects.Group;
     attackDelay = 2000;
     lastAttack = 0;
     graphics: any;
     debug = false;
     attackDistanceLimit = 100;
 
-    constructor(scene: MainScene, x, y, key) {
+    constructor(scene: MainScene, x, y, key, shotGroup) {
         super(scene, x, y, key, "Enemy");
 
+        this.shotGroup = shotGroup;
         this.setSize(8, 10).setOffset(4, 6);
+        this.play('enemy');
         if (this.debug) this.graphics = this.scene.add.graphics();
     }
 
@@ -46,7 +53,7 @@ export default class Enemy extends Entity {
     }
 
     private attack(player: Player) {
-        new FireBall(this.scene as MainScene, this.x, this.y, 'spriteSheet', player);
+        this.shotGroup.add(new FireBall(this.scene as MainScene, this.x, this.y, 'spriteSheet', player));
     }
 
     /**

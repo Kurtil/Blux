@@ -1,19 +1,25 @@
 import Entity from "./entity";
 
 export default class Gem extends Entity {
-    constructor(scene, x, y, key) {
-        super(scene, x, y, key, "Gem");
 
-        // Animations management
-        this.createAnimations();
+    big: boolean = null;
+
+    constructor(scene, x, y, key, big: boolean) {
+        super(scene, x, y, key, "Gem");
+        this.big = big;
+        if (big) {
+            this.setScale(2);
+            // TODO Why next line do not work ?
+            // this.refreshBody();
+            this.body.reset(this.x, this.y);
+        }
         this.anims.play("gem");
+
+        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false)
     }
-    createAnimations(): any {
-        this.scene.anims.create({
-            key: "gem",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 80, end: 86 }),
-            frameRate: 10,
-            repeat: -1,
-        });
+
+    onPickedUp(): any {
+        this.scene.sound.play('gemPickedUp', { volume: 0.2, detune: this.big ? -1000 : 0 });
+        this.destroy();
     }
 }

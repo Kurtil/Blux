@@ -21,8 +21,6 @@ export default class FireBall extends Entity {
             Math.cos(angle) * this.speed,
             Math.sin(angle) * this.speed
         );
-        // TODO find a better way to register the fireBall collider
-        (this.scene as MainScene).enemiesFireBalls.add(this);
     }
 
 }
