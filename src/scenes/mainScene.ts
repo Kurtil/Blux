@@ -1,4 +1,4 @@
-import Player from "../entities/player";
+import Player from "../entities/player/player";
 import MainSceneHUD from "./mainSceneHUD";
 import EnemyFactory from "../utils/enemyFactory";
 import GemFactory from "../utils/gemFactory";
@@ -51,9 +51,8 @@ export default class MainScene extends Phaser.Scene {
 
     // Physic management
     this.physics.add.collider(this.player, this.ground);
-    this.physics.add.collider(this.player, this.enemies, player => player.setData('isDead', true));
-    this.physics.add.collider(this.player, enemyFactory.getEnemiesShotGroup(), player => this.player.setData('isDead', true));
-    this.physics.add.collider(this.enemies, this.ground);
+    this.physics.add.collider(this.player, this.enemies, (player: Player) => player.onHit());
+    this.physics.add.collider(this.player, enemyFactory.getEnemiesShotGroup(), (player: Player) => player.onHit());
     this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground, fireball => fireball.destroy());
 
     this.physics.add.overlap(signs, this.player, sign =>
@@ -89,9 +88,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     if (this.player.getData('isDead') === true) {
-      const cam = this.cameras.main;
-      cam.shake(250, 0.005);
-      cam.fade(250, 30, 0, 0);
+      this.cameras.main.fade(250, 30, 0, 0);
     }
   }
 

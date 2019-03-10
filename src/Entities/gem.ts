@@ -15,7 +15,7 @@ export default class Gem extends Entity {
         }
         this.anims.play("gem");
 
-        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false)
+        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     }
 
     onPickedUp(): any {

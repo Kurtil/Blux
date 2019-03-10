@@ -1,7 +1,7 @@
 import Entity from "./entity";
 import MainScene from "../scenes/mainScene";
 import FireBall from "./fireBall";
-import Player from "./player";
+import Player from "./player/player";
 import EnemyFactory from "../utils/enemyFactory";
 
 export default class Enemy extends Entity {
@@ -17,7 +17,7 @@ export default class Enemy extends Entity {
     attackDistanceLimit = 100;
 
     constructor(scene: MainScene, x, y, key, shotGroup) {
-        super(scene, x, y, key, "Enemy");
+        super(scene, x, y, key, "Enemy", Phaser.Physics.Arcade.STATIC_BODY);
 
         this.shotGroup = shotGroup;
         this.setSize(8, 10).setOffset(4, 6);
