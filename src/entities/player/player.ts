@@ -56,7 +56,7 @@ export default class Player extends Entity {
     onHit() {
         this.scene.cameras.main.shake(100, 0.001);
         if (this.hitSoundAvailable) {
-            this.scene.sound.play('playerHit', { volume: 0.1 });
+            this.scene.sound.play('playerHit', { volume: 0.15 });
             this.hitSoundAvailable = false;
         }
         this.scene.time.addEvent({

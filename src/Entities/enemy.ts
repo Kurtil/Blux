@@ -2,7 +2,6 @@ import Entity from "./entity";
 import MainScene from "../scenes/mainScene";
 import FireBall from "./fireBall";
 import Player from "./player/player";
-import EnemyFactory from "../utils/enemyFactory";
 
 export default class Enemy extends Entity {
 
@@ -20,7 +19,7 @@ export default class Enemy extends Entity {
         super(scene, x, y, key, "Enemy", Phaser.Physics.Arcade.STATIC_BODY);
 
         this.shotGroup = shotGroup;
-        this.setSize(8, 10).setOffset(4, 6);
+        this.setSize(16, 14).setOffset(0, 2);
         this.play('enemy');
         if (this.debug) this.graphics = this.scene.add.graphics();
     }
@@ -53,6 +52,13 @@ export default class Enemy extends Entity {
     }
 
     private attack(player: Player) {
+        // the sound should be lounder if the player is closer
+        const distanceToPlayer = Phaser.Math.Distance.Between(
+            player.x,
+            player.y,
+            this.x,
+            this.y);
+        this.scene.sound.play('fire', { volume: 0.1 / Math.max((distanceToPlayer / 50), 1) });
         this.shotGroup.add(new FireBall(this.scene as MainScene, this.x, this.y, 'spriteSheet', player));
     }
 

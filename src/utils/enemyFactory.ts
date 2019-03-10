@@ -39,7 +39,7 @@ export default class EnemyFactory {
     private createAnimations(): any {
         this.scene.anims.create({
             key: "enemy",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 60, end: 65 }),
+            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 51, end: 56 }),
             frameRate: 10,
             repeat: -1,
         });
@@ -48,6 +48,11 @@ export default class EnemyFactory {
             frames: this.scene.anims.generateFrameNumbers(this.textureKey, { start: 76, end: 79 }),
             frameRate: 24,
             repeat: -1,
+        });
+        this.scene.anims.create({
+            key: "fireBallExplodes",
+            frames: this.scene.anims.generateFrameNumbers(this.textureKey, { start: 131, end: 137 }),
+            frameRate: 15,
         });
     }
 }

@@ -19,6 +19,8 @@ export default class StartMenuScene extends Phaser.Scene {
         this.load.audio("playerHit", "assets/sounds/hit.wav");
         this.load.audio("playerAttack", "assets/sounds/attack.wav");
         this.load.audio("gemPickedUp", "assets/sounds/gemPickedUp.wav");
+        this.load.audio("fire", "assets/sounds/fire.wav");
+        this.load.audio("explodes", "assets/sounds/explodes.wav");
         this.load.audio("victory", "assets/sounds/victory.wav");
         this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
     }

@@ -3,6 +3,7 @@ import MainSceneHUD from "./mainSceneHUD";
 import EnemyFactory from "../utils/enemyFactory";
 import GemFactory from "../utils/gemFactory";
 import Gem from "../entities/gem";
+import FireBall from "../entities/fireBall";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -51,9 +52,9 @@ export default class MainScene extends Phaser.Scene {
 
     // Physic management
     this.physics.add.collider(this.player, this.ground);
-    this.physics.add.collider(this.player, this.enemies, (player: Player) => player.onHit());
-    this.physics.add.collider(this.player, enemyFactory.getEnemiesShotGroup(), (player: Player) => player.onHit());
-    this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground, fireball => fireball.destroy());
+    this.physics.add.collider(this.player, this.enemies);
+    this.physics.add.collider(this.player, enemyFactory.getEnemiesShotGroup(), (player: Player, fireball: FireBall) => { player.onHit(); fireball.hit(); });
+    this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground, (fireball: FireBall) => fireball.hit());
 
     this.physics.add.overlap(signs, this.player, sign =>
       // TODO why key message does not work here ???
