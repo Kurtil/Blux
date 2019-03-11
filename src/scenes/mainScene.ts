@@ -4,6 +4,8 @@ import EnemyFactory from "../utils/enemyFactory";
 import GemFactory from "../utils/gemFactory";
 import Gem from "../entities/gem";
 import FireBall from "../entities/fireBall";
+import PlayerShot from "../entities/player/playerShot";
+import Enemy from "../entities/enemy";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -46,6 +48,7 @@ export default class MainScene extends Phaser.Scene {
 
     // Entities creations
     this.player = new Player(this, spawnPoint.x, spawnPoint.y, "spriteSheet");
+    const shotGroup = this.player.shotGroup;
     const gems = (new GemFactory(this, 'spriteSheet')).generateGemsFromMap(this.map);
     const enemyFactory = new EnemyFactory(this, 'spriteSheet');
     this.enemies = enemyFactory.generateEnemiesFromMap(this.map);
@@ -68,6 +71,16 @@ export default class MainScene extends Phaser.Scene {
       gem.onPickedUp();
       player.setData('score', player.getData('score') + 1);
       (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerScore(player.getData('score'));
+    });
+
+    this.physics.add.collider(shotGroup, this.ground, (shot: PlayerShot) => shot.hit());
+    this.physics.add.overlap(shotGroup, enemyFactory.getEnemiesShotGroup(), (playerShot: PlayerShot, fireBall: FireBall) => {
+      fireBall.hit();
+      playerShot.hit();
+    });
+    this.physics.add.overlap(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
+      shot.hit();
+      // enemy.hit();
     });
 
     // Camera management

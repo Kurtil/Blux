@@ -2,9 +2,9 @@ import Entity from "../entity";
 import MainScene from "../../scenes/mainScene";
 import State from "./playerStates/playerState";
 import IdlePlayerState from "./playerStates/idlePlayerState";
-import { RIGHT } from "phaser";
 import PlayerCommands from "./playerCommands";
 import DiePLayerState from "./playerStates/diePlayerState";
+import PlayerShot from "./playerShot";
 
 export default class Player extends Entity {
 
@@ -16,6 +16,7 @@ export default class Player extends Entity {
     hitSoundAvailable = true;
     canJump = true;
     life = 3;
+    shotGroup: Phaser.GameObjects.Group = null;
 
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
@@ -29,6 +30,8 @@ export default class Player extends Entity {
 
         // Animations management
         this.createAnimations();
+
+        this.shotGroup = this.scene.add.group();
 
         this.currentState = new IdlePlayerState(this);
     }
@@ -64,7 +67,7 @@ export default class Player extends Entity {
             callback: () => this.hitSoundAvailable = true,
             delay: 1000
         });
-        this.life --;
+        this.life--;
         if (this.life <= 0) {
             this.onKilled();
         } else {
@@ -83,6 +86,7 @@ export default class Player extends Entity {
     }
 
     attack(): any {
+        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y, 'spriteSheet', this));
         this.scene.sound.play("playerAttack", { volume: 0.2, detune: Math.random() * 50 - 25 });
     }
 
@@ -139,14 +143,25 @@ export default class Player extends Entity {
         this.scene.anims.create({
             key: "attack",
             frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 20, end: 36 }),
-            frameRate: 24,
-            repeat: 0
+            frameRate: 36,
+            repeat: -1
         });
         this.scene.anims.create({
             key: "die",
             frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 40, end: 50 }),
             frameRate: 24,
             repeat: 0
+        });
+        this.scene.anims.create({
+            key: "playerShot",
+            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 140, end: 147 }),
+            frameRate: 24,
+            repeat: -1
+        });
+        this.scene.anims.create({
+            key: "playerShotExplodes",
+            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 150, end: 163 }),
+            frameRate: 50,
         });
     }
 }
