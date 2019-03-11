@@ -80,7 +80,7 @@ export default class MainScene extends Phaser.Scene {
     });
     this.physics.add.overlap(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
       shot.hit();
-      // enemy.hit();
+      enemy.hit();
     });
 
     // Camera management

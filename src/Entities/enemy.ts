@@ -14,6 +14,11 @@ export default class Enemy extends Entity {
     graphics: any;
     debug = false;
     attackDistanceLimit = 100;
+    maxLifeCount = 3;
+    life = 3;
+    lifeBars: { life: Phaser.GameObjects.Graphics, damage: Phaser.GameObjects.Graphics };
+    green: Phaser.GameObjects.Graphics;
+    isDead = false;
 
     constructor(scene: MainScene, x, y, key, shotGroup) {
         super(scene, x, y, key, "Enemy", Phaser.Physics.Arcade.STATIC_BODY);
@@ -22,33 +27,88 @@ export default class Enemy extends Entity {
         this.setSize(16, 14).setOffset(0, 2);
         this.play('enemy');
         if (this.debug) this.graphics = this.scene.add.graphics();
+
+        // life management
+        this.drawLifeBars();
     }
 
     update(time) {
-        const player = (this.scene as MainScene).player;
+        // hide life bar if full life
+        const fullHealth = this.life === this.maxLifeCount;
+        this.lifeBars.damage.setAlpha(fullHealth ? 0 : 1);
+        this.lifeBars.life.setAlpha(fullHealth ? 0 : 1);
 
-        // To add debug lines between player and enemy
-        if (this.debug) {
-            this.graphics.clear();
-            this.graphics.lineStyle(1, 0xffffff, 1);
-            const drawLine = new Phaser.Curves.Line(new Phaser.Math.Vector2(this.x, this.y),
-                new Phaser.Math.Vector2(player.x, player.y));
-            drawLine.draw(this.graphics);
+        if (!this.isDead) {
+            const player = (this.scene as MainScene).player;
+
+            // To add debug lines between player and enemy
+            if (this.debug) {
+                this.graphics.clear();
+                this.graphics.lineStyle(1, 0xffffff, 1);
+                const drawLine = new Phaser.Curves.Line(new Phaser.Math.Vector2(this.x, this.y),
+                    new Phaser.Math.Vector2(player.x, player.y));
+                drawLine.draw(this.graphics);
+            }
+
+            const distanceToPlayer = Phaser.Math.Distance.Between(
+                player.x,
+                player.y,
+                this.x,
+                this.y);
+
+            if (distanceToPlayer < this.attackDistanceLimit &&
+                this.canSee(player) &&
+                time - this.lastAttack > this.attackDelay) {
+
+                this.attack(player);
+                this.lastAttack = time;
+            }
         }
+    }
 
-        const distanceToPlayer = Phaser.Math.Distance.Between(
-            player.x,
-            player.y,
-            this.x,
-            this.y);
+    hit() {
+        this.onHit();
+    }
 
-        if (distanceToPlayer < this.attackDistanceLimit &&
-            this.canSee(player) &&
-            time - this.lastAttack > this.attackDelay) {
-
-            this.attack(player);
-            this.lastAttack = time;
+    private onHit() {
+        this.life--;
+        this.updateLifeBar();
+        if (this.life === 0) {
+            this.onDead();
         }
+    }
+
+    private onDead() {
+        this.clearLifeBar();
+        this.disableBody();
+        this.isDead = true;
+        this.play('enemyDestroy');
+        this.scene.sound.play('enemyDestroy', { volume: 0.1 })
+        this.once('animationcomplete-enemyDestroy', () => this.destroy());
+    }
+
+    /**
+     * Draw the green and the red (bottom) life bars
+     */
+    private drawLifeBars(): any {
+        this.lifeBars = {
+            damage: this.scene.add.graphics({ fillStyle: { color: 0xff0000 } }).fillRectShape(this.getLifeRectangle(true)),
+            life: this.scene.add.graphics({ fillStyle: { color: 0x00ff00 } }).fillRectShape(this.getLifeRectangle())
+        }
+    }
+
+    private updateLifeBar() {
+        this.lifeBars.life.destroy();
+        this.lifeBars.life = this.scene.add.graphics({ fillStyle: { color: 0x00ff00 } }).fillRectShape(this.getLifeRectangle());
+    }
+
+    private clearLifeBar() {
+        this.lifeBars.life.destroy();
+        this.lifeBars.damage.destroy();
+    }
+
+    private getLifeRectangle(max = false): Phaser.Geom.Rectangle {
+        return new Phaser.Geom.Rectangle(this.x + 6, this.y - 11, max ? -12 : -12 * (this.life / this.maxLifeCount), 2);
     }
 
     private attack(player: Player) {

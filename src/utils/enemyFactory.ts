@@ -54,5 +54,10 @@ export default class EnemyFactory {
             frames: this.scene.anims.generateFrameNumbers(this.textureKey, { start: 131, end: 137 }),
             frameRate: 15,
         });
+        this.scene.anims.create({
+            key: "enemyDestroy",
+            frames: this.scene.anims.generateFrameNumbers(this.textureKey, { start: 170, end: 177 }),
+            frameRate: 15,
+        });
     }
 }
