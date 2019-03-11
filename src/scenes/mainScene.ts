@@ -53,7 +53,11 @@ export default class MainScene extends Phaser.Scene {
     // Physic management
     this.physics.add.collider(this.player, this.ground);
     this.physics.add.collider(this.player, this.enemies);
-    this.physics.add.collider(this.player, enemyFactory.getEnemiesShotGroup(), (player: Player, fireball: FireBall) => { player.onHit(); fireball.hit(); });
+    this.physics.add.overlap(this.player, enemyFactory.getEnemiesShotGroup(), (player: Player, fireball: FireBall) => {
+      player.onHit();
+      (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life);
+      fireball.hit();
+    });
     this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground, (fireball: FireBall) => fireball.hit());
 
     this.physics.add.overlap(signs, this.player, sign =>

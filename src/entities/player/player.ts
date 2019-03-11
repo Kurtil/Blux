@@ -15,6 +15,7 @@ export default class Player extends Entity {
     killed = false;
     hitSoundAvailable = true;
     canJump = true;
+    life = 3;
 
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
@@ -63,7 +64,22 @@ export default class Player extends Entity {
             callback: () => this.hitSoundAvailable = true,
             delay: 1000
         });
-        this.onKilled();
+        this.life --;
+        if (this.life <= 0) {
+            this.onKilled();
+        } else {
+            let tween = this.scene.tweens.add({
+                targets: this,
+                duration: 100,
+                alpha: 0,
+                onComplete() {
+                    this.alpha = 1;
+                },
+                onCompleteScope: this,
+                repeat: 3
+            });
+
+        }
     }
 
     attack(): any {
