@@ -5,10 +5,12 @@
   "main": "src/index.js",
   "scripts": {
     "build": "webpack",
-    "deploy": "gh-pages -d build",
+    "dist": "webpack --config webpack-dist.config.js",
+    "deploy": "gh-pages -d dist",
     "start": "npm run build && webpack-dev-server --port=8000"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^5.0.1",
     "gh-pages": "^2.0.1",
     "raw-loader": "^1.0.0",
     "ts-loader": "^5.3.3",

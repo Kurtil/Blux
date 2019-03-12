@@ -22,7 +22,7 @@ jobs:
             npm i
             git config user.email "ci-build@kurtil.net"
             git config user.name "ci-build-kurtil"
-      - run: npm run build
+      - run: npm run dist
       - run: npm run deploy
 
 workflows:
