@@ -5,9 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "build": "webpack",
+    "deploy": "gh-pages -d build",
     "start": "npm run build && webpack-dev-server --port=8000"
   },
   "devDependencies": {
+    "gh-pages": "^2.0.1",
     "raw-loader": "^1.0.0",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4",

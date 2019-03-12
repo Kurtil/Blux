@@ -8,7 +8,7 @@ module.exports = {
   entry: "./src/game.ts",
   output: {
     path: path.resolve(__dirname, "build"),
-    publicPath: "/build/",
+    publicPath: "/Blux/",
     filename: "project.bundle.js"
   },
   module: {

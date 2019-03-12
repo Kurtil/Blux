@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build-and-deploy:
+    docker:
+      - image : circleci/node:lts
+    working_directory: ~/blux
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: npm i
+      - run: npm run build
+      - run: npm run deploy
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-and-deploy:
+          filters:
+            branches:
+              only: master
