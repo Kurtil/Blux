@@ -6,7 +6,9 @@ jobs:
     working_directory: ~/blux
     steps:
       - checkout
-
+      - add_ssh_keys:
+          fingerprints:
+            - "69:e5:e7:4b:f4:57:c2:64:2b:b2:75:d8:26:93:c8:3a"
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -14,7 +16,12 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: npm i
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm i
+            git config user.email "ci-build@kurtil.net"
+            git config user.name "ci-build-kurtil"
       - run: npm run build
       - run: npm run deploy
 
