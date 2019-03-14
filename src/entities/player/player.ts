@@ -45,7 +45,7 @@ export default class Player extends Entity {
     jump(time) {
         if (time - this.lastJumpTime > this.jumpDelay) {
             this.setVelocityY(-200);
-            this.scene.sound.play("playerJump", { volume: 0.2, detune: Math.random() * 50 - 25 });
+            this.scene.sound.play("playerJump", { detune: Math.random() * 50 - 25 });
             this.lastJumpTime = time;
             return true;
         } else {
@@ -60,7 +60,7 @@ export default class Player extends Entity {
     onHit() {
         this.scene.cameras.main.shake(100, 0.001);
         if (this.hitSoundAvailable) {
-            this.scene.sound.play('playerHit', { volume: 0.15 });
+            this.scene.sound.play('playerHit', { volume: 0.85 });
             this.hitSoundAvailable = false;
         }
         this.scene.time.addEvent({
@@ -87,7 +87,7 @@ export default class Player extends Entity {
 
     attack(): any {
         this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y, 'spriteSheet', this));
-        this.scene.sound.play("playerAttack", { volume: 0.2, detune: Math.random() * 50 - 25 });
+        this.scene.sound.play("playerAttack", { detune: Math.random() * 50 - 25 });
     }
 
     onDead(): any {

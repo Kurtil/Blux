@@ -83,7 +83,7 @@ export default class Enemy extends Entity {
         this.disableBody();
         this.isDead = true;
         this.play('enemyDestroy');
-        this.scene.sound.play('enemyDestroy', { volume: 0.1 })
+        this.scene.sound.play('enemyDestroy', { volume: 0.5 })
         this.once('animationcomplete-enemyDestroy', () => this.destroy());
     }
 
@@ -118,7 +118,7 @@ export default class Enemy extends Entity {
             player.y,
             this.x,
             this.y);
-        this.scene.sound.play('fire', { volume: 0.1 / Math.max((distanceToPlayer / 50), 1) });
+        this.scene.sound.play('fire', { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
         this.shotGroup.add(new FireBall(this.scene as MainScene, this.x, this.y, 'spriteSheet', player));
     }
 

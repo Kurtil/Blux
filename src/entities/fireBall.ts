@@ -34,7 +34,7 @@ export default class FireBall extends Entity {
             this.target.y,
             this.x,
             this.y);
-        this.scene.sound.play('explodes', { volume: 0.1 / Math.max((distanceToPlayer / 50), 1) });
+        this.scene.sound.play('explodes', { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
         this.once('animationcomplete-fireBallExplodes', () => this.destroy());
     }
 

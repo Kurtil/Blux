@@ -24,7 +24,9 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
 
-    this.sound.play('mainTheme', { volume: 0.05, loop: true });
+    this.sys.sound.volume = 0.2;
+
+    this.sound.play('mainTheme', { volume: 0.25, loop: true });
 
     // Map management
     this.map = this.make.tilemap({ key: 'map' });

@@ -29,7 +29,7 @@ export default class PlayerShot extends Entity {
             this.player.y,
             this.x,
             this.y);
-        this.scene.sound.play('playerShotExplodes', { volume: 0.1 / Math.max((distanceToPlayer / 50), 1) });
+        this.scene.sound.play('playerShotExplodes', { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
         this.once('animationcomplete-playerShotExplodes', () => this.destroy());
     }
 

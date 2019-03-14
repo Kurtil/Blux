@@ -19,7 +19,7 @@ export default class Gem extends Entity {
     }
 
     onPickedUp(): any {
-        this.scene.sound.play('gemPickedUp', { volume: 0.2, detune: this.big ? -1000 : 0 });
+        this.scene.sound.play('gemPickedUp', { detune: this.big ? -1000 : 0 });
         this.destroy();
     }
 }
