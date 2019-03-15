@@ -9,24 +9,16 @@ export default class Heart extends Entity {
 
         this.scene.add.tween({
             targets: this,
-            x: {
-                value: this.x - 2,
-            },
-            y: {
-                value: this.y - 2,
-                delay: 100,
-            },
-            ease: Phaser.Math.Easing.Circular.InOut,
+            scaleX: 0.8,
+            scaleY: 0.8,
             yoyo: true,
-            duration: 100,
-            hold: 100,
-            repeatDelay: 100,
             repeat: -1,
+            duration: 200,
         });
     }
 
     onPickedUp(): any {
-        this.scene.sound.play('gemPickedUp');
+        this.scene.sound.play('lifeUp');
         this.destroy();
     }
 }

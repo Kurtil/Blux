@@ -86,7 +86,7 @@ export default class Enemy extends Entity {
         this.play('enemyDestroy');
         this.scene.sound.play('enemyDestroy', { volume: 0.5 })
         this.once('animationcomplete-enemyDestroy', () => {
-            const heart = new Heart(this.scene, this.x, this.y, 'spriteSheet');
+            if (Phaser.Math.Between(1,4) === 4) (this.scene as MainScene).heartGroup.add(new Heart(this.scene, this.x, this.y, 'spriteSheet'));
             this.destroy();
         });
     }

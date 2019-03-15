@@ -6,6 +6,7 @@ import Gem from "../entities/gem";
 import FireBall from "../entities/fireBall";
 import PlayerShot from "../entities/player/playerShot";
 import Enemy from "../entities/enemy";
+import Heart from "../entities/heart";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -15,6 +16,7 @@ export default class MainScene extends Phaser.Scene {
   map: Phaser.Tilemaps.Tilemap = null;
   enemies: Phaser.GameObjects.Sprite[] = null;
   ground: Phaser.Tilemaps.StaticTilemapLayer = null;
+  heartGroup: Phaser.GameObjects.Group = null;
 
   constructor() {
     super({
@@ -56,6 +58,9 @@ export default class MainScene extends Phaser.Scene {
     const enemyFactory = new EnemyFactory(this, 'spriteSheet');
     this.enemies = enemyFactory.generateEnemiesFromMap(this.map);
 
+    // Heart management TOTO refacto like global pick up factory
+    this.heartGroup = this.add.group();
+
     // Physic management
     this.physics.add.collider(this.player, this.ground);
     this.physics.add.collider(this.player, this.enemies);
@@ -84,6 +89,12 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.overlap(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
       shot.hit();
       enemy.hit();
+    });
+
+    this.physics.add.overlap(this.player, this.heartGroup, (player: Player, heart: Heart) => {
+      heart.onPickedUp();
+      player.life++;
+      (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life);
     });
 
     // Camera management
