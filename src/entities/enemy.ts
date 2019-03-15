@@ -87,27 +87,6 @@ export default class Enemy extends Entity {
         this.scene.sound.play('enemyDestroy', { volume: 0.5 })
         this.once('animationcomplete-enemyDestroy', () => {
             const heart = new Heart(this.scene, this.x, this.y, 'spriteSheet');
-            this.scene.add.tween({
-                targets: heart,
-                x: this.x - 2,
-                yoyo: true,
-                ease: 'Power0',
-                duration: 100,
-                hold: 100,
-                repeatDelay : 100,
-                repeat: -1,
-            });
-            this.scene.add.tween({
-                targets: heart,
-                y: this.y - 2,
-                yoyo: true,
-                ease: 'Power0',
-                delay: 100,
-                hold: 100,
-                repeatDelay : 100,
-                duration: 100,
-                repeat: -1,
-            });
             this.destroy();
         });
     }
