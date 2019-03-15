@@ -3,6 +3,7 @@ import MainScene from "../scenes/mainScene";
 import FireBall from "./fireBall";
 import Player from "./player/player";
 import Heart from "./heart";
+import ExtraLife from "./extraLife";
 
 export default class Enemy extends Entity {
 
@@ -86,7 +87,9 @@ export default class Enemy extends Entity {
         this.play('enemyDestroy');
         this.scene.sound.play('enemyDestroy', { volume: 0.5 })
         this.once('animationcomplete-enemyDestroy', () => {
-            if (Phaser.Math.Between(1,4) === 4) (this.scene as MainScene).heartGroup.add(new Heart(this.scene, this.x, this.y, 'spriteSheet'));
+            const randomNumber = Phaser.Math.Between(1, 12);
+            if (randomNumber <= 3) (this.scene as MainScene).heartGroup.add(new Heart(this.scene, this.x, this.y, 'spriteSheet'));
+            else if (randomNumber === 12) (this.scene as MainScene).extraLifeGroup.add(new ExtraLife(this.scene, this.x, this.y, 'spriteSheet'));
             this.destroy();
         });
     }
