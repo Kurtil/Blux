@@ -25,6 +25,7 @@ export default class MainScene extends Phaser.Scene {
   create() {
 
     this.sys.sound.volume = 0.2;
+    // this.cameras.main.roundPixels = true;
 
     this.sound.play('mainTheme', { volume: 0.25, loop: true });
 

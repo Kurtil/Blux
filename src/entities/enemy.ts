@@ -2,6 +2,7 @@ import Entity from "./entity";
 import MainScene from "../scenes/mainScene";
 import FireBall from "./fireBall";
 import Player from "./player/player";
+import Heart from "./heart";
 
 export default class Enemy extends Entity {
 
@@ -35,7 +36,7 @@ export default class Enemy extends Entity {
     update(time) {
         // hide life bar if full life
         const fullHealth = this.life === this.maxLifeCount;
-        this.lifeBars.damage.setAlpha(fullHealth ? 0 : 1);
+        this.lifeBars.damage.setVisible(fullHealth ? false : true);
         this.lifeBars.life.setAlpha(fullHealth ? 0 : 1);
 
         if (!this.isDead) {
@@ -84,7 +85,31 @@ export default class Enemy extends Entity {
         this.isDead = true;
         this.play('enemyDestroy');
         this.scene.sound.play('enemyDestroy', { volume: 0.5 })
-        this.once('animationcomplete-enemyDestroy', () => this.destroy());
+        this.once('animationcomplete-enemyDestroy', () => {
+            const heart = new Heart(this.scene, this.x, this.y, 'spriteSheet');
+            this.scene.add.tween({
+                targets: heart,
+                x: this.x - 2,
+                yoyo: true,
+                ease: 'Power0',
+                duration: 100,
+                hold: 100,
+                repeatDelay : 100,
+                repeat: -1,
+            });
+            this.scene.add.tween({
+                targets: heart,
+                y: this.y - 2,
+                yoyo: true,
+                ease: 'Power0',
+                delay: 100,
+                hold: 100,
+                repeatDelay : 100,
+                duration: 100,
+                repeat: -1,
+            });
+            this.destroy();
+        });
     }
 
     /**
