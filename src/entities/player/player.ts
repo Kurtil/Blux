@@ -21,7 +21,7 @@ export default class Player extends Entity {
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
 
-        this.setSize(12, 15).setOffset(2, 1);
+        this.setSize(10, 15).setOffset(3, 1);
         this.setData("speed", 140);
         this.setData('isDead', false);
         this.setData('score', 0);
