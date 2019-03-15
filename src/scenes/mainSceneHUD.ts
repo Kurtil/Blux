@@ -1,22 +1,26 @@
+import Player from "../entities/player/player";
+
 export default class MainSceneHUD extends Phaser.Scene {
 
     infos: Phaser.GameObjects.Text = null;
     displayinInfos = false;
     hud: Phaser.GameObjects.Text = null;
-    life: Phaser.GameObjects.Text = null;
     initMessage = '0 / 10';
-    initLife = '3 x'
+    player: Player = null;
+    lifes : Phaser.GameObjects.Sprite[] = null;
 
     constructor() {
         super({ key: 'mainSceneHUD' });
     }
 
-    init({ playerScore, life }) {
+    init({ player, playerScore, lifes }) {
         if (playerScore) this.initMessage = `${playerScore} / 10`;
-        if (life) this.initLife = `${life} x`;
+        // if (lifes) this.lifes = lifes;
+        if (player) this.player = player;
     }
 
     create() {
+
         this.hud = this.add.text(10, 10, this.initMessage, {
             font: "24px monospace",
             fill: "#ffffff",
@@ -27,15 +31,8 @@ export default class MainSceneHUD extends Phaser.Scene {
         const gem = this.add.sprite(135, 20, 'spriteSheet', 80).setScale(2);
         gem.tint = 0xDDDDDD;
 
-
-        this.life = this.add.text(700, 10, this.initLife, {
-            font: "24px monospace",
-            fill: "#ffffff",
-        })
-            .setDepth(30)
-            .setScrollFactor(0);
-        const heart = this.add.sprite(774, 20, 'spriteSheet', 95).setScale(2);
-
+        this.lifes = [];
+        this.displayLife(this.player.life, this.player.maxLife);
 
         this.infos = this.add.text(10, 566, '', {
             font: "24px monospace",
@@ -49,8 +46,8 @@ export default class MainSceneHUD extends Phaser.Scene {
         this.hud.setText(`${playerScore} / 10`);
     }
 
-    updatePlayerLife(life) {
-        this.life.setText(`${life} x`)
+    updatePlayerLife(life, maxLife) {
+        this.displayLife(life, maxLife);
     }
 
     displayInformations(infos: any): any {
@@ -64,6 +61,22 @@ export default class MainSceneHUD extends Phaser.Scene {
                     this.displayinInfos = false;
                 }
             });
+        }
+    }
+
+    private displayLife(life, maxLife) {
+        const spaceBetweenHeart = 3;
+        const heartWidth = 16 * 2;
+        const firstPosition = (this.game.config.width as number) - spaceBetweenHeart - heartWidth;
+
+        this.lifes.forEach(life => life.destroy());
+        this.lifes = [];
+        for (let i = 0; i < maxLife; i++) {
+            if (i + 1 > life) {
+                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i, 20, 'spriteSheet', 96).setScale(2));
+            } else {
+                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i, 20, 'spriteSheet', 95).setScale(2));
+            }
         }
     }
 }

@@ -45,18 +45,18 @@ export default class MainScene extends Phaser.Scene {
     const signs = this.map.createFromObjects('signs', 95, { key: 'spriteSheet', frame: 94 })
       .map(sign => (this.physics.world.enableBody(sign), (sign.body as Phaser.Physics.Arcade.Body).setAllowGravity(false), sign));
 
-    // Enable HUD
-    this.scene.add('mainSceneHUD', MainSceneHUD, true); // score may be passed here as object : { playerScore: X }
-    this.events.once('shutdown', () => {
-      this.scene.remove('mainSceneHUD');
-    });
-
     // Entities creations
     this.player = new Player(this, spawnPoint.x, spawnPoint.y, "spriteSheet");
     const shotGroup = this.player.shotGroup;
     const gems = (new GemFactory(this, 'spriteSheet')).generateGemsFromMap(this.map);
     const enemyFactory = new EnemyFactory(this, 'spriteSheet');
     this.enemies = enemyFactory.generateEnemiesFromMap(this.map);
+
+    // Enable HUD
+    this.scene.add('mainSceneHUD', MainSceneHUD, true, { player: this.player }); // score may be passed here as object : { playerScore: X }
+    this.events.once('shutdown', () => {
+      this.scene.remove('mainSceneHUD');
+    });
 
     // Heart management TOTO refacto like global pick up factory
     this.heartGroup = this.add.group();
@@ -66,7 +66,7 @@ export default class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.enemies);
     this.physics.add.overlap(this.player, enemyFactory.getEnemiesShotGroup(), (player: Player, fireball: FireBall) => {
       player.onHit();
-      (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life);
+      (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life, player.maxLife);
       fireball.hit();
     });
     this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground, (fireball: FireBall) => fireball.hit());
@@ -92,9 +92,10 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.physics.add.overlap(this.player, this.heartGroup, (player: Player, heart: Heart) => {
-      heart.onPickedUp();
-      player.life++;
-      (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life);
+      if (player.pickLife()) {
+        heart.onPickedUp();
+        (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life, player.maxLife);
+      }
     });
 
     // Camera management

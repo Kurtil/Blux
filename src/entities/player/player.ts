@@ -16,6 +16,7 @@ export default class Player extends Entity {
     hitSoundAvailable = true;
     canJump = true;
     life = 3;
+    maxLife = 3;
     shotGroup: Phaser.GameObjects.Group = null;
 
     constructor(scene: MainScene, x, y, key) {
@@ -71,7 +72,7 @@ export default class Player extends Entity {
         if (this.life <= 0) {
             this.onKilled();
         } else {
-            let tween = this.scene.tweens.add({
+            this.scene.tweens.add({
                 targets: this,
                 duration: 100,
                 alpha: 0,
@@ -82,6 +83,15 @@ export default class Player extends Entity {
                 repeat: 3
             });
 
+        }
+    }
+
+    pickLife(): boolean {
+        if (this.life < this.maxLife) {
+            this.life ++;
+            return true;
+        } else {
+            return false;
         }
     }
 
