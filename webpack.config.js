@@ -8,7 +8,7 @@ module.exports = {
   entry: "./src/game.ts",
   output: {
     path: path.resolve(__dirname, "build"),
-    publicPath: "/Blux/",
+    publicPath: "/build/",
     filename: "project.bundle.js"
   },
   module: {
@@ -34,6 +34,6 @@ module.exports = {
     })
   ],
   devServer: {
-    disableHostCheck: true
+    disableHostCheck: true,
   }
 };
