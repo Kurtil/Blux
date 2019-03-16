@@ -1,6 +1,5 @@
 export default class WinScene extends Phaser.Scene {
 
-    private keySpace: Phaser.Input.Keyboard.Key = null;
     private nextScene = 'startMenuScene';
 
     constructor() {
@@ -11,25 +10,17 @@ export default class WinScene extends Phaser.Scene {
 
     create() {
         this.add
-            .text(
-                // TODO find a way to get the width of the text to replace 135 Magic Number
-                (<number>this.game.config.width) * 0.5 - 100,
+            .bitmapText(
+                (<number>this.game.config.width) * 0.5,
                 (<number>this.game.config.height) * 0.5,
+                'nokia-white',
                 'You won !',
-                {
-                    font: "18px monospace",
-                    fill: "#ffffff",
-                });
+                36)
+            .setOrigin(0.5, 0.5);
 
         this.time.addEvent({ delay: 2000, callback: () => this.scene.start(this.nextScene) });
-        this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.input.keyboard.once('keydown-SPACE', () => this.scene.start(this.nextScene));
 
         this.sound.play("victory");
-    }
-
-    update() {
-        if (this.keySpace.isDown) {
-            this.scene.start(this.nextScene);
-        }
     }
 }
