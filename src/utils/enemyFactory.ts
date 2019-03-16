@@ -27,8 +27,9 @@ export default class EnemyFactory {
     }
 
     generateEnemiesFromMap(map): Phaser.GameObjects.Sprite[] {
-        const enemies = map.getObjectLayer('enemies').objects.map((enemy: any) =>
-            new Enemy(this.scene as MainScene, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2, this.textureKey, this.shotGroup));
+        const enemies = map.getObjectLayer("enemies").objects.map((enemy: any) =>
+            new Enemy(this.scene as MainScene, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2,
+                this.textureKey, this.shotGroup));
         return enemies;
     }
 

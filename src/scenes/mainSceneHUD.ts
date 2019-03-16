@@ -1,4 +1,4 @@
-import spriteSheetConfig from '../../assets/spriteSheets/spriteSheet.json';
+import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
 import Player from "../entities/player/player";
 
 export default class MainSceneHUD extends Phaser.Scene {
@@ -6,14 +6,14 @@ export default class MainSceneHUD extends Phaser.Scene {
     infos: Phaser.GameObjects.BitmapText = null;
     displayinInfos = false;
     score: Phaser.GameObjects.BitmapText = null;
-    initMessage = '0 / 10';
+    initMessage = "0 / 10";
     player: Player = null;
     lifes: Phaser.GameObjects.Sprite[] = null;
     gem: Phaser.GameObjects.Sprite;
     infoRect: any;
 
     constructor() {
-        super({ key: 'mainSceneHUD' });
+        super({ key: "mainSceneHUD" });
     }
 
     init({ player, playerScore, lifes }) {
@@ -24,7 +24,7 @@ export default class MainSceneHUD extends Phaser.Scene {
 
     create() {
 
-        this.score = this.add.bitmapText(20, 10, 'nokia-white', this.initMessage, 24);
+        this.score = this.add.bitmapText(20, 10, "nokia-white", this.initMessage, 24);
         this.gem = this.add.sprite(this.score.width + 2 * 20, 20, spriteSheetConfig.name, 80)
             .setScale(2)
             .setOrigin(0, 0.5);
@@ -37,7 +37,7 @@ export default class MainSceneHUD extends Phaser.Scene {
         this.lifes = [];
         this.displayLife(this.player.life, this.player.maxLife);
 
-        this.infos = this.add.bitmapText(10, 566, 'nokia-white', '', 24);
+        this.infos = this.add.bitmapText(10, 566, "nokia-white", "", 24);
         this.infoRect = this.add.rectangle(0, 0, 0, 0, 0x443333).setVisible(false).setDepth(-1);
         this.updateInfoRect();
     }
@@ -66,7 +66,7 @@ export default class MainSceneHUD extends Phaser.Scene {
             this.time.addEvent({
                 delay: 300,
                 callback: () => {
-                    this.infos.setText('');
+                    this.infos.setText("");
                     this.displayinInfos = false;
                     this.infoRect.setVisible(false);
                 }

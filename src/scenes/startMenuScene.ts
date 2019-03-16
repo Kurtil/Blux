@@ -1,4 +1,4 @@
-import spriteSheetConfig from '../../assets/spriteSheets/spriteSheet.json';
+import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
 
 export default class StartMenuScene extends Phaser.Scene {
 
@@ -28,8 +28,8 @@ export default class StartMenuScene extends Phaser.Scene {
         this.load.audio("explodes", "assets/sounds/explodes.wav");
         this.load.audio("victory", "assets/sounds/victory.wav");
         this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
-        this.load.bitmapFont('nokia-black', 'assets/fonts/bitmap/nokia16black.png', 'assets/fonts/bitmap/nokia16.xml');
-        this.load.bitmapFont('nokia-white', 'assets/fonts/bitmap/nokia16white.png', 'assets/fonts/bitmap/nokia16.xml');
+        this.load.bitmapFont("nokia-black", "assets/fonts/bitmap/nokia16black.png", "assets/fonts/bitmap/nokia16.xml");
+        this.load.bitmapFont("nokia-white", "assets/fonts/bitmap/nokia16white.png", "assets/fonts/bitmap/nokia16.xml");
     }
 
     create() {
@@ -37,8 +37,8 @@ export default class StartMenuScene extends Phaser.Scene {
             .bitmapText(
                 (<number>this.game.config.width) * 0.5,
                 (<number>this.game.config.height) * 0.5,
-                'nokia-white',
-                'Press Space to start',
+                "nokia-white",
+                "Press Space to start",
                 36)
             .setOrigin(0.5, 0.5);
 

@@ -1,4 +1,4 @@
-import spriteSheetConfig from '../../../assets/spriteSheets/spriteSheet.json';
+import spriteSheetConfig from "../../../assets/spriteSheets/spriteSheet.json";
 import Entity from "../entity";
 import MainScene from "../../scenes/mainScene";
 import State from "./playerStates/playerState";
@@ -25,8 +25,8 @@ export default class Player extends Entity {
 
         this.setSize(10, 15).setOffset(3, 1);
         this.setData("speed", 140);
-        this.setData('isDead', false);
-        this.setData('score', 0);
+        this.setData("isDead", false);
+        this.setData("score", 0);
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
 
@@ -62,7 +62,7 @@ export default class Player extends Entity {
     onHit() {
         this.scene.cameras.main.shake(100, 0.001);
         if (this.hitSoundAvailable) {
-            this.scene.sound.play('playerHit', { volume: 0.85 });
+            this.scene.sound.play("playerHit", { volume: 0.85 });
             this.hitSoundAvailable = false;
         }
         this.scene.time.addEvent({
@@ -103,7 +103,7 @@ export default class Player extends Entity {
 
     onDead(): any {
         this.scene.cameras.main.shake(250, 0.005);
-        this.setData('isDead', true);
+        this.setData("isDead", true);
     }
 
     private isOutOfBounds(): any {

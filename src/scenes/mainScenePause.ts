@@ -1,6 +1,6 @@
 export default class MainScenePause extends Phaser.Scene {
     constructor() {
-        super({ key: 'mainScenePause' });
+        super({ key: "mainScenePause" });
     }
 
     create() {
@@ -10,8 +10,8 @@ export default class MainScenePause extends Phaser.Scene {
         const pauseText = this.add
             .bitmapText(
                 (this.game.config.width as number) / 2, this.game.config.height as number / 2,
-                'nokia-white',
-                'Pause',
+                "nokia-white",
+                "Pause",
                 36)
             .setOrigin(0.5, 0.5)
             .setDepth(1);
@@ -25,13 +25,13 @@ export default class MainScenePause extends Phaser.Scene {
         );
 
         this.add.rectangle(0, 0, this.game.config.width as number, this.game.config.height as number, 0x333333, 0.5)
-            .setScale(this.scene.get('mainScene').cameras.main.zoom);
+            .setScale(this.scene.get("mainScene").cameras.main.zoom);
 
-        this.input.keyboard.once('keydown-P', () => {
-            this.scene.resume('mainScene');
-            this.scene.resume('mainSceneHUD');
-            this.scene.get('mainScene').sound.resumeAll();
-            this.scene.get('mainScene').input.keyboard.resetKeys();
+        this.input.keyboard.once("keydown-P", () => {
+            this.scene.resume("mainScene");
+            this.scene.resume("mainSceneHUD");
+            this.scene.get("mainScene").sound.resumeAll();
+            this.scene.get("mainScene").input.keyboard.resetKeys();
             this.scene.stop();
         });
     }

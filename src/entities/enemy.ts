@@ -1,4 +1,4 @@
-import spriteSheetConfig from '../../assets/spriteSheets/spriteSheet.json';
+import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
 import Entity from "./entity";
 import MainScene from "../scenes/mainScene";
 import FireBall from "./fireBall";
@@ -28,7 +28,7 @@ export default class Enemy extends Entity {
 
         this.shotGroup = shotGroup;
         this.setSize(16, 14).setOffset(0, 2);
-        this.play('enemy');
+        this.play("enemy");
         if (this.debug) this.graphics = this.scene.add.graphics();
 
         // life management
@@ -85,12 +85,17 @@ export default class Enemy extends Entity {
         this.clearLifeBar();
         this.disableBody();
         this.isDead = true;
-        this.play('enemyDestroy');
-        this.scene.sound.play('enemyDestroy', { volume: 0.5 })
-        this.once('animationcomplete-enemyDestroy', () => {
+        this.play("enemyDestroy");
+        this.scene.sound.play("enemyDestroy", { volume: 0.5 });
+        this.once("animationcomplete-enemyDestroy", () => {
             const randomNumber = Phaser.Math.Between(1, 12);
-            if (randomNumber <= 3) (this.scene as MainScene).heartGroup.add(new Heart(this.scene, this.x, this.y, spriteSheetConfig.name));
-            else if (randomNumber === 12) (this.scene as MainScene).extraLifeGroup.add(new ExtraLife(this.scene, this.x, this.y, spriteSheetConfig.name));
+            if (randomNumber <= 3) {
+                (this.scene as MainScene).heartGroup.add(new Heart(this.scene, this.x, this.y, spriteSheetConfig.name));
+            }
+            else if (randomNumber === 12) {
+                (this.scene as MainScene).extraLifeGroup.add(
+                    new ExtraLife(this.scene, this.x, this.y, spriteSheetConfig.name));
+            }
             this.destroy();
         });
     }
@@ -100,14 +105,16 @@ export default class Enemy extends Entity {
      */
     private drawLifeBars(): any {
         this.lifeBars = {
-            damage: this.scene.add.graphics({ fillStyle: { color: 0xff0000 } }).fillRectShape(this.getLifeRectangle(true)),
+            damage: this.scene.add.graphics({ fillStyle: { color: 0xff0000 } })
+                .fillRectShape(this.getLifeRectangle(true)),
             life: this.scene.add.graphics({ fillStyle: { color: 0x00ff00 } }).fillRectShape(this.getLifeRectangle())
-        }
+        };
     }
 
     private updateLifeBar() {
         this.lifeBars.life.destroy();
-        this.lifeBars.life = this.scene.add.graphics({ fillStyle: { color: 0x00ff00 } }).fillRectShape(this.getLifeRectangle());
+        this.lifeBars.life = this.scene.add.graphics({ fillStyle: { color: 0x00ff00 } })
+            .fillRectShape(this.getLifeRectangle());
     }
 
     private clearLifeBar() {
@@ -126,7 +133,7 @@ export default class Enemy extends Entity {
             player.y,
             this.x,
             this.y);
-        this.scene.sound.play('fire', { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
+        this.scene.sound.play("fire", { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
         this.shotGroup.add(new FireBall(this.scene as MainScene, this.x, this.y, spriteSheetConfig.name, player));
     }
 
@@ -136,7 +143,8 @@ export default class Enemy extends Entity {
      */
     private canSee(player: Player) {
         const line = new Phaser.Geom.Line(this.x, this.y, player.x, player.y);
-        const hiddingTiles = (this.scene as MainScene).ground.getTilesWithinShape(line).filter(tile => tile.index !== -1);
+        const hiddingTiles = (this.scene as MainScene).ground.getTilesWithinShape(line)
+            .filter(tile => tile.index !== -1);
         return hiddingTiles.length === 0;
     }
 }

@@ -1,6 +1,5 @@
 "use strict";
 
-const webpack = require("webpack");
 const path = require("path");
 
 module.exports = {
@@ -14,8 +13,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: [/\.vert$/, /\.frag$/],
-        use: "raw-loader"
+        test: /\.ts$/,
+        enforce: 'pre',
+        loader: 'tslint-loader',
+        options: {
+          configurations: require('./tslint.json'),
+        }
       },
       {
         test: /\.ts$/,
@@ -27,12 +30,6 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      CANVAS_RENDERER: JSON.stringify(true),
-      WEBGL_RENDERER: JSON.stringify(true)
-    })
-  ],
   devServer: {
     disableHostCheck: true,
   }

@@ -1,0 +1,18 @@
+{
+    "rules": {
+        "quotemark": [
+            true,
+            "double"
+        ],
+        "max-line-length": {
+            "options": [
+                120
+            ]
+        },
+        "no-consecutive-blank-lines": true,
+        "semicolon": [
+            true,
+            "always"
+        ]
+    }
+}

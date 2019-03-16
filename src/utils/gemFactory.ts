@@ -15,13 +15,14 @@ export default class GemFactory {
      */
     constructor(scene: Phaser.Scene, textureKey: string) {
         this.scene = scene;
-        this.textureKey = textureKey
+        this.textureKey = textureKey;
         this.createAnimations();
     }
 
     generateGemsFromMap(map) {
-        return map.getObjectLayer('gems').objects.map((gem: any) =>
-            new Gem(this.scene as MainScene, gem.x + gem.width / 2, gem.y - gem.height / 2, this.textureKey, gem.width === 32 ? true : false)
+        return map.getObjectLayer("gems").objects.map((gem: any) =>
+            new Gem(this.scene as MainScene, gem.x + gem.width / 2, gem.y - gem.height / 2, this.textureKey,
+                gem.width === 32 ? true : false)
         );
     }
 
