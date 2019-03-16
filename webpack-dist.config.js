@@ -32,6 +32,7 @@ module.exports = {
     new CopyPlugin([
       { from: 'assets/', to: 'assets/' },
       { from: 'index.dist.html', to: 'index.html' },
+      { from: '.circleci/', to: '.circleci/' },
     ]),
   ],
 };
