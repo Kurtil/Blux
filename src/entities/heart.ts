@@ -18,7 +18,7 @@ export default class Heart extends Entity {
     }
 
     onPickedUp(): any {
-        this.scene.sound.play("lifeUp");
+        this.scene.sound.play("healthUp");
         this.destroy();
     }
 }

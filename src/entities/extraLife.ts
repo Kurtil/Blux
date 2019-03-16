@@ -26,7 +26,7 @@ export default class ExtraLife extends Entity {
     }
 
     onPickedUp(): any {
-        this.scene.sound.play("lifeUp", { detune: 500 });
+        this.scene.sound.play("healthUp", { detune: 500 });
         this.destroy();
     }
 }
