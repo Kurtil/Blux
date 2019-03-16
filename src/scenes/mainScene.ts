@@ -166,6 +166,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   private pause() {
+    this.scene.pause('mainSceneHUD');
     this.scene.pause();
     this.sound.pauseAll();
     this.scene.launch('mainScenePause');

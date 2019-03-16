@@ -26,21 +26,19 @@ export default class StartMenuScene extends Phaser.Scene {
         this.load.audio("explodes", "assets/sounds/explodes.wav");
         this.load.audio("victory", "assets/sounds/victory.wav");
         this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
+        this.load.bitmapFont('nokia-black', 'assets/fonts/bitmap/nokia16black.png', 'assets/fonts/bitmap/nokia16.xml');
+        this.load.bitmapFont('nokia-white', 'assets/fonts/bitmap/nokia16white.png', 'assets/fonts/bitmap/nokia16.xml');
     }
 
     create() {
         this.add
-            .text(
-                // TODO find a way to get the width of the text to replace 135 Magic Number
-                (<number>this.game.config.width) * 0.5 - 135,
+            .bitmapText(
+                (<number>this.game.config.width) * 0.5,
                 (<number>this.game.config.height) * 0.5,
+                'nokia-white',
                 'Press Space to start',
-                {
-                    font: "18px monospace",
-                    fill: "#000000",
-                    padding: { x: 20, y: 10 },
-                    backgroundColor: "#ffffff"
-                });
+                36)
+            .setOrigin(0.5, 0.5);
 
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     }

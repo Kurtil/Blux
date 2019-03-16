@@ -2,12 +2,14 @@ import Player from "../entities/player/player";
 
 export default class MainSceneHUD extends Phaser.Scene {
 
-    infos: Phaser.GameObjects.Text = null;
+    infos: Phaser.GameObjects.BitmapText = null;
     displayinInfos = false;
-    hud: Phaser.GameObjects.Text = null;
+    score: Phaser.GameObjects.BitmapText = null;
     initMessage = '0 / 10';
     player: Player = null;
-    lifes : Phaser.GameObjects.Sprite[] = null;
+    lifes: Phaser.GameObjects.Sprite[] = null;
+    gem: Phaser.GameObjects.Sprite;
+    infoRect: any;
 
     constructor() {
         super({ key: 'mainSceneHUD' });
@@ -21,29 +23,33 @@ export default class MainSceneHUD extends Phaser.Scene {
 
     create() {
 
-        this.hud = this.add.text(10, 10, this.initMessage, {
-            font: "24px monospace",
-            fill: "#ffffff",
-        })
-            .setDepth(30)
-            .setScrollFactor(0);
-
-        const gem = this.add.sprite(135, 20, 'spriteSheet', 80).setScale(2);
-        gem.tint = 0xDDDDDD;
+        this.score = this.add.bitmapText(20, 10, 'nokia-white', this.initMessage, 24);
+        this.gem = this.add.sprite(this.score.width + 2 * 20, 20, 'spriteSheet', 80)
+            .setScale(2)
+            .setOrigin(0, 0.5);
+        this.add.rectangle(5, 5, this.score.width + this.gem.width + 3 * 20, this.score.height + 2 * 5, 0x443333)
+            .setOrigin(0, 0)
+            .setDepth(-1);
+        // this.add.container(400, 300, [this.gem, this.score]);
 
         this.lifes = [];
         this.displayLife(this.player.life, this.player.maxLife);
 
-        this.infos = this.add.text(10, 566, '', {
-            font: "24px monospace",
-            fill: "#ffffff",
-        })
-            .setDepth(30)
-            .setScrollFactor(0);
+        this.infos = this.add.bitmapText(10, 566, 'nokia-white', '', 24);
+        this.infoRect = this.add.rectangle(0, 0, 0, 0, 0x443333).setVisible(false).setDepth(-1);
+        this.updateInfoRect();
+    }
+
+    private updateInfoRect(): any {
+        this.infoRect.x = this.infos.x - 5;
+        this.infoRect.y = this.infos.y;
+        this.infoRect.width = this.infos.width + 5;
+        this.infoRect.height = this.infos.height + 5;
+        return this.infoRect;
     }
 
     updatePlayerScore(playerScore) {
-        this.hud.setText(`${playerScore} / 10`);
+        this.score.setText(`${playerScore} / 10`);
     }
 
     updatePlayerLife(life, maxLife) {
@@ -52,6 +58,7 @@ export default class MainSceneHUD extends Phaser.Scene {
 
     displayInformations(infos: any): any {
         this.infos.setText(infos);
+        this.updateInfoRect().setVisible(true);
         if (!this.displayinInfos) {
             this.displayinInfos = true;
             this.time.addEvent({
@@ -59,6 +66,7 @@ export default class MainSceneHUD extends Phaser.Scene {
                 callback: () => {
                     this.infos.setText('');
                     this.displayinInfos = false;
+                    this.infoRect.setVisible(false);
                 }
             });
         }
