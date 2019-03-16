@@ -8,6 +8,7 @@ import PlayerShot from "../entities/player/playerShot";
 import Enemy from "../entities/enemy";
 import Heart from "../entities/heart";
 import ExtraLife from "../entities/extraLife";
+import MainScenePause from "./mainScenePause";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -54,10 +55,12 @@ export default class MainScene extends Phaser.Scene {
     const enemyFactory = new EnemyFactory(this, 'spriteSheet');
     this.enemies = enemyFactory.generateEnemiesFromMap(this.map);
 
-    // Enable HUD
+    // Enable HUD and pause
     this.scene.add('mainSceneHUD', MainSceneHUD, true, { player: this.player }); // score may be passed here as object : { playerScore: X }
+    this.scene.add('mainScenePause', MainScenePause, false);
     this.events.once('shutdown', () => {
       this.scene.remove('mainSceneHUD');
+      this.scene.remove('mainScenePause');
     });
 
     // Heart management TOTO refacto like global pick up factory
@@ -118,6 +121,11 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.setDebugGraphics(this.DEBUG);
+
+    // pause key
+    this.input.keyboard.on('keydown-P', () => {
+      this.pause();
+    });
   }
 
   update(time) {
@@ -155,5 +163,11 @@ export default class MainScene extends Phaser.Scene {
       displayed = !displayed;
     }
     this.input.keyboard.on("keydown_D", toggleDebugGraphics);
+  }
+
+  private pause() {
+    this.scene.pause();
+    this.sound.pauseAll();
+    this.scene.launch('mainScenePause');
   }
 }
