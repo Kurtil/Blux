@@ -1,5 +1,4 @@
 import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
-import Player from "../entities/player/player";
 
 export default class MainSceneHUD extends Phaser.Scene {
 
@@ -7,7 +6,8 @@ export default class MainSceneHUD extends Phaser.Scene {
     displayinInfos = false;
     score: Phaser.GameObjects.BitmapText = null;
     initMessage = "0 / 10";
-    player: Player = null;
+    playerHealth: number = null;
+    playerMaxHealth: number = null;
     lifes: Phaser.GameObjects.Sprite[] = null;
     gem: Phaser.GameObjects.Sprite;
     infoRect: any;
@@ -16,10 +16,10 @@ export default class MainSceneHUD extends Phaser.Scene {
         super({ key: "mainSceneHUD" });
     }
 
-    init({ player, playerScore, lifes }) {
+    init({ playerHealth, playerMaxHealth, playerScore }) {
         if (playerScore) this.initMessage = `${playerScore} / 10`;
-        // if (lifes) this.lifes = lifes;
-        if (player) this.player = player;
+        if (playerHealth) this.playerHealth = playerHealth;
+        if (playerMaxHealth) this.playerMaxHealth = playerMaxHealth;
     }
 
     create() {
@@ -32,10 +32,9 @@ export default class MainSceneHUD extends Phaser.Scene {
             this.score.height + 2 * 5, 0x443333)
             .setOrigin(0, 0)
             .setDepth(-1);
-        // this.add.container(400, 300, [this.gem, this.score]);
 
         this.lifes = [];
-        this.displayLife(this.player.life, this.player.maxLife);
+        this.displayLife(this.playerHealth, this.playerMaxHealth);
 
         this.infos = this.add.bitmapText(10, 566, "nokia-white", "", 24);
         this.infoRect = this.add.rectangle(0, 0, 0, 0, 0x443333).setVisible(false).setDepth(-1);

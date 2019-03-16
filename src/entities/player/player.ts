@@ -13,12 +13,23 @@ export default class Player extends Entity {
     jumpDelay = 200;
     lastJumpTime = 0;
     currentState: State;
-    killed = false;
+    dying = false;
+    isDead = false;
     hitSoundAvailable = true;
     canJump = true;
-    life = 3;
-    maxLife = 3;
+    _health = 3;
+    maxHealth = 3;
     shotGroup: Phaser.GameObjects.Group = null;
+    score = 0;
+
+    get health() {
+        return this._health;
+    }
+
+    set health(value) {
+        this._health = value;
+        if (this._health <= 0) this.onDying();
+    }
 
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
@@ -26,7 +37,6 @@ export default class Player extends Entity {
         this.setSize(10, 15).setOffset(3, 1);
         this.setData("speed", 140);
         this.setData("isDead", false);
-        this.setData("score", 0);
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
 
@@ -39,6 +49,8 @@ export default class Player extends Entity {
     }
 
     update(time: number) {
+        if (this.dying) this.onDying();
+
         this.currentState.update(this.handleUserInput(this.cursors), time);
 
         if (this.isOutOfBounds()) this.onDead();
@@ -69,10 +81,8 @@ export default class Player extends Entity {
             callback: () => this.hitSoundAvailable = true,
             delay: 1000
         });
-        this.life--;
-        if (this.life <= 0) {
-            this.onKilled();
-        } else {
+        this.health--;
+        if (this.health > 0) {
             this.scene.tweens.add({
                 targets: this,
                 duration: 100,
@@ -87,13 +97,25 @@ export default class Player extends Entity {
         }
     }
 
-    pickLife(): boolean {
-        if (this.life < this.maxLife) {
-            this.life++;
-            return true;
-        } else {
-            return false;
+    /**
+    * @param effect the effect that will (probably) affect the player
+    * @returns true if the effect affected the player, false if no effect
+    */
+    affect(effect): boolean {
+        const { health, maxHealth, score } = effect;
+        let affected = false;
+        if (health) {
+            if (health > 0) affected = this.healthUp(health);
         }
+        if (score) {
+            this.score += score;
+            affected = true;
+        }
+        if (maxHealth) {
+            this.updateMaxHealth(maxHealth);
+            affected = true;
+        }
+        return affected;
     }
 
     attack(): any {
@@ -103,7 +125,27 @@ export default class Player extends Entity {
 
     onDead(): any {
         this.scene.cameras.main.shake(250, 0.005);
-        this.setData("isDead", true);
+        this.isDead = true;
+    }
+
+    private healthUp(health: number): boolean {
+        if (this.health < this.maxHealth) {
+            this.health = Math.min(this.health + health, this.maxHealth);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private updateMaxHealth(maxHealthChange) {
+        if (maxHealthChange > 0) {
+            this.maxHealth += maxHealthChange;
+        } else if (maxHealthChange < 0) {
+            this.maxHealth += maxHealthChange;
+            if (this.health > this.maxHealth) {
+                this.health = this.maxHealth;
+            }
+        }
     }
 
     private isOutOfBounds(): any {
@@ -112,10 +154,10 @@ export default class Player extends Entity {
             this.y > (<MainScene>this.scene).map.height * (<MainScene>this.scene).map.tileHeight;
     }
 
-    private onKilled() {
+    private onDying() {
         // can be killed only one time :) TODO : do better
-        if (!this.killed) this.setCurrentState(new DiePLayerState(this));
-        this.killed = true;
+        if (!this.dying) this.setCurrentState(new DiePLayerState(this));
+        this.dying = true;
     }
 
     private handleUserInput(cursors): PlayerCommands {

@@ -1,6 +1,9 @@
 import Entity from "./entity";
+import PickUp from "./pickup";
 
-export default class ExtraLife extends Entity {
+export default class ExtraLife extends Entity implements PickUp {
+
+    effect = { maxHealth: 1 };
 
     constructor(scene, x, y, key) {
         super(scene, x + 1, y + 1, key, "Gem", Phaser.Physics.Arcade.DYNAMIC_BODY, 97);
@@ -28,5 +31,9 @@ export default class ExtraLife extends Entity {
     onPickedUp(): any {
         this.scene.sound.play("healthUp", { detune: 500 });
         this.destroy();
+    }
+
+    getEffect() {
+        return this.effect;
     }
 }
