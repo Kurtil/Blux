@@ -90,10 +90,11 @@ export default class Enemy extends Entity {
         this.once("animationcomplete-enemyDestroy", () => {
             const randomNumber = Phaser.Math.Between(1, 12);
             if (randomNumber <= 3) {
-                (this.scene as MainScene).heartGroup.add(new Heart(this.scene, this.x, this.y, spriteSheetConfig.name));
+                (this.scene as MainScene).pickupGroup.add(
+                    new Heart(this.scene, this.x, this.y, spriteSheetConfig.name));
             }
             else if (randomNumber === 12) {
-                (this.scene as MainScene).extraLifeGroup.add(
+                (this.scene as MainScene).pickupGroup.add(
                     new ExtraLife(this.scene, this.x, this.y, spriteSheetConfig.name));
             }
             this.destroy();

@@ -3,13 +3,11 @@ import Player from "../entities/player/player";
 import MainSceneHUD from "./mainSceneHUD";
 import EnemyFactory from "../utils/enemyFactory";
 import GemFactory from "../utils/gemFactory";
-import Gem from "../entities/gem";
 import FireBall from "../entities/fireBall";
 import PlayerShot from "../entities/player/playerShot";
 import Enemy from "../entities/enemy";
-import Heart from "../entities/heart";
-import ExtraLife from "../entities/extraLife";
 import MainScenePause from "./mainScenePause";
+import PickUp from "../entities/pickup.js";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -19,8 +17,7 @@ export default class MainScene extends Phaser.Scene {
     map: Phaser.Tilemaps.Tilemap = null;
     enemies: Phaser.GameObjects.Sprite[] = null;
     ground: Phaser.Tilemaps.StaticTilemapLayer = null;
-    heartGroup: Phaser.GameObjects.Group = null;
-    extraLifeGroup: Phaser.GameObjects.Group = null;
+    pickupGroup: Phaser.GameObjects.Group = null;
 
     constructor() {
         super({
@@ -53,7 +50,6 @@ export default class MainScene extends Phaser.Scene {
         // Entities creations
         this.player = new Player(this, spawnPoint.x, spawnPoint.y, spriteSheetConfig.name);
         const shotGroup = this.player.shotGroup;
-        const gems = (new GemFactory(this, spriteSheetConfig.name)).generateGemsFromMap(this.map);
         const enemyFactory = new EnemyFactory(this, spriteSheetConfig.name);
         this.enemies = enemyFactory.generateEnemiesFromMap(this.map);
 
@@ -66,9 +62,9 @@ export default class MainScene extends Phaser.Scene {
             this.scene.remove("mainScenePause");
         });
 
-        // Heart management TOTO refacto like global pick up factory
-        this.heartGroup = this.add.group();
-        this.extraLifeGroup = this.add.group();
+        // Pickup management
+        this.pickupGroup = this.add.group();
+        this.pickupGroup.addMultiple((new GemFactory(this, spriteSheetConfig.name)).generateGemsFromMap(this.map));
 
         // Physic management
         this.physics.add.collider(this.player, this.ground);
@@ -86,10 +82,11 @@ export default class MainScene extends Phaser.Scene {
             // TODO why key message does not work here ???
             (this.scene.get("mainSceneHUD") as MainSceneHUD).displayInformations(sign.data.get("0").value));
 
-        this.physics.add.overlap(this.player, gems, (player: Player, gem: Gem) => {
-            if (player.affect(gem.getEffect())) {
-                gem.onPickedUp();
+        this.physics.add.overlap(this.player, this.pickupGroup, (player: Player, pickup: PickUp | any) => {
+            if (player.affect(pickup.getEffect())) {
+                pickup.onPickedUp();
                 (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerScore(player.score);
+                (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(player.health, player.maxHealth);
             }
         });
 
@@ -102,19 +99,6 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.overlap(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
             shot.hit();
             enemy.hit();
-        });
-
-        this.physics.add.overlap(this.player, this.heartGroup, (player: Player, heart: Heart) => {
-            if (player.affect(heart.getEffect())) {
-                heart.onPickedUp();
-                (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(player.health, player.maxHealth);
-            }
-        });
-
-        this.physics.add.overlap(this.player, this.extraLifeGroup, (player: Player, extraLife: ExtraLife) => {
-            player.maxHealth++;
-            extraLife.onPickedUp();
-            (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(player.health, player.maxHealth);
         });
 
         // Camera management
