@@ -1,3 +1,5 @@
+import spriteSheetConfig from '../../assets/spriteSheets/spriteSheet.json';
+
 export default class StartMenuScene extends Phaser.Scene {
 
     keySpace: Phaser.Input.Keyboard.Key;
@@ -9,7 +11,7 @@ export default class StartMenuScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet("spriteSheet", "assets/spriteSheets/BluxSpriteSheet.png", {
+        this.load.spritesheet(spriteSheetConfig.name, "assets/spriteSheets/BluxSpriteSheet.png", {
             frameWidth: 16,
             frameHeight: 16
         });

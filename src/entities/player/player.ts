@@ -1,3 +1,4 @@
+import spriteSheetConfig from '../../../assets/spriteSheets/spriteSheet.json';
 import Entity from "../entity";
 import MainScene from "../../scenes/mainScene";
 import State from "./playerStates/playerState";
@@ -88,7 +89,7 @@ export default class Player extends Entity {
 
     pickLife(): boolean {
         if (this.life < this.maxLife) {
-            this.life ++;
+            this.life++;
             return true;
         } else {
             return false;
@@ -96,7 +97,7 @@ export default class Player extends Entity {
     }
 
     attack(): any {
-        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y, 'spriteSheet', this));
+        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y, spriteSheetConfig.name, this));
         this.scene.sound.play("playerAttack", { detune: Math.random() * 50 - 25 });
     }
 
@@ -130,47 +131,47 @@ export default class Player extends Entity {
         // Animations
         this.scene.anims.create({
             key: "walk",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 0, end: 11 }),
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 0, end: 11 }),
             frameRate: 20,
             repeat: -1
         });
         this.scene.anims.create({
             key: "idle",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 12, end: 13 }),
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 12, end: 13 }),
             frameRate: 2,
             repeat: -1
         });
         this.scene.anims.create({
             key: "jump",
-            frames: [{ key: "spriteSheet", frame: 15 }],
+            frames: [{ key: spriteSheetConfig.name, frame: 15 }],
             frameRate: 20
         });
         this.scene.anims.create({
             key: "land",
-            frames: [{ key: "spriteSheet", frame: 14 }],
+            frames: [{ key: spriteSheetConfig.name, frame: 14 }],
             frameRate: 20
         });
         this.scene.anims.create({
             key: "attack",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 20, end: 36 }),
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 20, end: 36 }),
             frameRate: 36,
             repeat: -1
         });
         this.scene.anims.create({
             key: "die",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 40, end: 50 }),
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 40, end: 50 }),
             frameRate: 24,
             repeat: 0
         });
         this.scene.anims.create({
             key: "playerShot",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 140, end: 147 }),
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 140, end: 147 }),
             frameRate: 24,
             repeat: -1
         });
         this.scene.anims.create({
             key: "playerShotExplodes",
-            frames: this.scene.anims.generateFrameNumbers("spriteSheet", { start: 150, end: 163 }),
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 150, end: 163 }),
             frameRate: 50,
         });
     }

@@ -1,3 +1,4 @@
+import spriteSheetConfig from '../../assets/spriteSheets/spriteSheet.json';
 import Player from "../entities/player/player";
 import MainSceneHUD from "./mainSceneHUD";
 import EnemyFactory from "../utils/enemyFactory";
@@ -36,7 +37,7 @@ export default class MainScene extends Phaser.Scene {
 
     // Map management
     this.map = this.make.tilemap({ key: 'map' });
-    const tileset = this.map.addTilesetImage("BluxSpriteSheet", "spriteSheet");
+    const tileset = this.map.addTilesetImage("BluxSpriteSheet", spriteSheetConfig.name);
 
     this.map.createStaticLayer("background", tileset);
     this.map.createStaticLayer("foreground01", tileset).setScrollFactor(0.9, 0.95).setDepth(10);
@@ -45,18 +46,19 @@ export default class MainScene extends Phaser.Scene {
     this.ground.setCollisionByProperty({ collides: true });
 
     const spawnPoint: any = this.map.findObject("spawn", obj => obj.name === "spawn");
-    const signs = this.map.createFromObjects('signs', 95, { key: 'spriteSheet', frame: 94 })
-      .map(sign => (this.physics.world.enableBody(sign), (sign.body as Phaser.Physics.Arcade.Body).setAllowGravity(false), sign));
+    const signs = this.map.createFromObjects('signs', 95, { key: spriteSheetConfig.name, frame: 94 })
+      .map(sign => (this.physics.world.enableBody(sign), (sign.body as Phaser.Physics.Arcade.Body)
+        .setAllowGravity(false), sign));
 
     // Entities creations
-    this.player = new Player(this, spawnPoint.x, spawnPoint.y, "spriteSheet");
+    this.player = new Player(this, spawnPoint.x, spawnPoint.y, spriteSheetConfig.name);
     const shotGroup = this.player.shotGroup;
-    const gems = (new GemFactory(this, 'spriteSheet')).generateGemsFromMap(this.map);
-    const enemyFactory = new EnemyFactory(this, 'spriteSheet');
+    const gems = (new GemFactory(this, spriteSheetConfig.name)).generateGemsFromMap(this.map);
+    const enemyFactory = new EnemyFactory(this, spriteSheetConfig.name);
     this.enemies = enemyFactory.generateEnemiesFromMap(this.map);
 
     // Enable HUD and pause
-    this.scene.add('mainSceneHUD', MainSceneHUD, true, { player: this.player }); // score may be passed here as object : { playerScore: X }
+    this.scene.add('mainSceneHUD', MainSceneHUD, true, { player: this.player });
     this.scene.add('mainScenePause', MainScenePause, false);
     this.events.once('shutdown', () => {
       this.scene.remove('mainSceneHUD');
@@ -70,12 +72,14 @@ export default class MainScene extends Phaser.Scene {
     // Physic management
     this.physics.add.collider(this.player, this.ground);
     this.physics.add.collider(this.player, this.enemies);
-    this.physics.add.overlap(this.player, enemyFactory.getEnemiesShotGroup(), (player: Player, fireball: FireBall) => {
-      player.onHit();
-      (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life, player.maxLife);
-      fireball.hit();
-    });
-    this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground, (fireball: FireBall) => fireball.hit());
+    this.physics.add.overlap(this.player, enemyFactory.getEnemiesShotGroup(),
+      (player: Player, fireball: FireBall) => {
+        player.onHit();
+        (this.scene.get('mainSceneHUD') as MainSceneHUD).updatePlayerLife(player.life, player.maxLife);
+        fireball.hit();
+      });
+    this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground,
+      (fireball: FireBall) => fireball.hit());
 
     this.physics.add.overlap(signs, this.player, sign =>
       // TODO why key message does not work here ???
@@ -88,10 +92,11 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.physics.add.collider(shotGroup, this.ground, (shot: PlayerShot) => shot.hit());
-    this.physics.add.overlap(shotGroup, enemyFactory.getEnemiesShotGroup(), (playerShot: PlayerShot, fireBall: FireBall) => {
-      fireBall.hit();
-      playerShot.hit();
-    });
+    this.physics.add.overlap(shotGroup, enemyFactory.getEnemiesShotGroup(),
+      (playerShot: PlayerShot, fireBall: FireBall) => {
+        fireBall.hit();
+        playerShot.hit();
+      });
     this.physics.add.overlap(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
       shot.hit();
       enemy.hit();

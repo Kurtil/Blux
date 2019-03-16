@@ -1,3 +1,4 @@
+import spriteSheetConfig from '../../assets/spriteSheets/spriteSheet.json';
 import Player from "../entities/player/player";
 
 export default class MainSceneHUD extends Phaser.Scene {
@@ -24,10 +25,11 @@ export default class MainSceneHUD extends Phaser.Scene {
     create() {
 
         this.score = this.add.bitmapText(20, 10, 'nokia-white', this.initMessage, 24);
-        this.gem = this.add.sprite(this.score.width + 2 * 20, 20, 'spriteSheet', 80)
+        this.gem = this.add.sprite(this.score.width + 2 * 20, 20, spriteSheetConfig.name, 80)
             .setScale(2)
             .setOrigin(0, 0.5);
-        this.add.rectangle(5, 5, this.score.width + this.gem.width + 3 * 20, this.score.height + 2 * 5, 0x443333)
+        this.add.rectangle(5, 5, this.score.width + this.gem.width + 3 * 20,
+            this.score.height + 2 * 5, 0x443333)
             .setOrigin(0, 0)
             .setDepth(-1);
         // this.add.container(400, 300, [this.gem, this.score]);
@@ -81,9 +83,11 @@ export default class MainSceneHUD extends Phaser.Scene {
         this.lifes = [];
         for (let i = 0; i < maxLife; i++) {
             if (i + 1 > life) {
-                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i, 20, 'spriteSheet', 96).setScale(2));
+                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i,
+                    20, spriteSheetConfig.name, 96).setScale(2));
             } else {
-                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i, 20, 'spriteSheet', 95).setScale(2));
+                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i,
+                    20, spriteSheetConfig.name, 95).setScale(2));
             }
         }
     }
