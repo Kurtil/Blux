@@ -1,25 +1,32 @@
 import SpiderDog from "../spiderDog";
+import spriteSheetConfig from "../../../../../assets/spriteSheets/spriteSheet.json";
+import AttackSpiderDogState from "./attackSpiderDogState";
 
 export default class WalkSpiderDogState {
 
     spiderDog: SpiderDog;
 
-    speed = 30;
-
     constructor(spiderDog: SpiderDog) {
         this.spiderDog = spiderDog;
-        this.spiderDog.anims.play("spiderDogWalk");
     }
 
     update() {
-        // TODO understand the differences between touching/blocked and collider/overlap !!!
-        if (this.spiderDog.body.blocked.left || this.spiderDog.body.touching.left) {
+        if (this.spiderDog.body.blocked.left) {
             this.spiderDog.flipX = false;
-            this.spiderDog.setVelocityX(this.speed);
-        }
-        if (this.spiderDog.body.blocked.right || this.spiderDog.body.touching.right) {
+            this.spiderDog.setFrame(spriteSheetConfig.content.spiderDog.face.frame);
+        } else if (this.spiderDog.body.blocked.right) {
             this.spiderDog.flipX = true;
-            this.spiderDog.setVelocityX(- this.speed);
+            this.spiderDog.setVelocityX(- this.spiderDog.currentSpeed);
+            this.spiderDog.setFrame(spriteSheetConfig.content.spiderDog.face.frame);
+        } else {
+            this.spiderDog.setVelocityX(this.spiderDog.flipX ?
+                - this.spiderDog.currentSpeed :
+                this.spiderDog.currentSpeed);
+            this.spiderDog.anims.play("spiderDogWalk", true);
+        }
+
+        if (this.spiderDog.canAttack()) {
+            return this.spiderDog.setCurrentState(new AttackSpiderDogState(this.spiderDog));
         }
     }
 

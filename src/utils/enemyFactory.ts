@@ -35,7 +35,7 @@ export default class EnemyFactory {
                     this.textureKey, this.shotGroup);
             } else if (enemy.name = "spiderDog") {
                 return new SpiderDog(this.scene as MainScene, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2,
-                    this.textureKey);
+                    this.textureKey, false);
             }
         });
         return enemies;
@@ -74,6 +74,16 @@ export default class EnemyFactory {
                 {
                     start: spriteSheetConfig.content.spiderDog.walk.from,
                     end: spriteSheetConfig.content.spiderDog.walk.to
+                }),
+            frameRate: 15,
+            repeat: -1,
+        });
+        this.scene.anims.create({
+            key: "spiderDogAttack",
+            frames: this.scene.anims.generateFrameNumbers(this.textureKey,
+                {
+                    start: spriteSheetConfig.content.spiderDog.attack.from,
+                    end: spriteSheetConfig.content.spiderDog.attack.to
                 }),
             frameRate: 15,
             repeat: -1,
