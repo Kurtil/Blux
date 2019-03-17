@@ -38,6 +38,8 @@ export default class Player extends Entity {
         this.setData("speed", 140);
         this.setData("isDead", false);
 
+        this.setDragX(100);
+
         this.cursors = this.scene.input.keyboard.createCursorKeys();
 
         // Animations management
