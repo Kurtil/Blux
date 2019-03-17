@@ -18,6 +18,8 @@ export default class MainScene extends Phaser.Scene {
     enemies: Phaser.GameObjects.Sprite[] = null;
     ground: Phaser.Tilemaps.StaticTilemapLayer = null;
     pickupGroup: Phaser.GameObjects.Group = null;
+    hitScore = 10;
+    nextScene: string;
 
     constructor() {
         super({
@@ -105,10 +107,9 @@ export default class MainScene extends Phaser.Scene {
         this.cameras.main.setZoom(3);
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(this.player);
-        // TODO camera fadeout complete will always lead to death... fix it
         this.cameras.main.once("camerafadeoutcomplete", () => {
             this.sound.stopAll();
-            this.scene.start("dieScene");
+            this.scene.start(this.nextScene);
         });
 
         this.setDebugGraphics(this.DEBUG);
@@ -123,19 +124,28 @@ export default class MainScene extends Phaser.Scene {
         this.enemies.forEach(enemy => enemy.update(time));
         this.player.update(time);
 
-        if (this.player.score === 10) {
-            this.sound.stopAll();
-            this.scene.start("winScene");
+        if (this.player.score === this.hitScore) {
+            this.onWin();
         }
-
         if (this.player.isDead) {
-            this.cameras.main.fade(250, 30, 0, 0);
+            this.onPlayerDead();
         }
     }
 
     updateHUD(): any {
         (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerScore(this.player.score);
         (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(this.player.health, this.player.maxHealth);
+    }
+
+    private onWin() {
+        // TODO player should be killed during the fade out... find a way to avoid that.
+        this.nextScene = "winScene";
+        this.cameras.main.fade(250, 30, 0, 0);
+    }
+
+    private onPlayerDead() {
+        this.nextScene = "dieScene";
+        this.cameras.main.fade(250, 30, 0, 0);
     }
 
     private setDebugGraphics(displayed: boolean) {
