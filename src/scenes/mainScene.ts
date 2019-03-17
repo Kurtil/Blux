@@ -5,7 +5,7 @@ import EnemyFactory from "../utils/enemyFactory";
 import GemFactory from "../utils/gemFactory";
 import FireBall from "../entities/fireBall";
 import PlayerShot from "../entities/player/playerShot";
-import Enemy from "../entities/enemy";
+import Enemy from "../entities/enemies/enemy";
 import MainScenePause from "./mainScenePause";
 import PickUp from "../entities/pickup.js";
 
@@ -68,6 +68,7 @@ export default class MainScene extends Phaser.Scene {
 
         // Physic management
         this.physics.add.collider(this.player, this.ground);
+        this.physics.add.collider(this.enemies, this.ground);
         this.physics.add.collider(this.player, this.enemies);
         this.physics.add.overlap(this.player, enemyFactory.getEnemiesShotGroup(),
             (player: Player, fireball: FireBall) => {
@@ -96,7 +97,7 @@ export default class MainScene extends Phaser.Scene {
                 fireBall.hit();
                 playerShot.hit();
             });
-        this.physics.add.overlap(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
+        this.physics.add.collider(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
             shot.hit();
             enemy.hit();
         });

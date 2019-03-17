@@ -1,5 +1,7 @@
-import Enemy from "../entities/enemy";
+import Enemy from "../entities/enemies/enemy";
 import MainScene from "../scenes/mainScene";
+import SpiderDog from "../entities/enemies/spiderDog/spiderDog";
+import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
 
 export default class EnemyFactory {
 
@@ -27,9 +29,15 @@ export default class EnemyFactory {
     }
 
     generateEnemiesFromMap(map): Phaser.GameObjects.Sprite[] {
-        const enemies = map.getObjectLayer("enemies").objects.map((enemy: any) =>
-            new Enemy(this.scene as MainScene, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2,
-                this.textureKey, this.shotGroup));
+        const enemies = map.getObjectLayer("enemies").objects.map((enemy: any) => {
+            if (enemy.name === "enemy") {
+                return new Enemy(this.scene as MainScene, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2,
+                    this.textureKey, this.shotGroup);
+            } else if (enemy.name = "spiderDog") {
+                return new SpiderDog(this.scene as MainScene, enemy.x + enemy.width / 2, enemy.y - enemy.height / 2,
+                    this.textureKey);
+            }
+        });
         return enemies;
     }
 
@@ -59,6 +67,16 @@ export default class EnemyFactory {
             key: "enemyDestroy",
             frames: this.scene.anims.generateFrameNumbers(this.textureKey, { start: 170, end: 177 }),
             frameRate: 15,
+        });
+        this.scene.anims.create({
+            key: "spiderDogWalk",
+            frames: this.scene.anims.generateFrameNumbers(this.textureKey,
+                {
+                    start: spriteSheetConfig.content.spiderDog.walk.from,
+                    end: spriteSheetConfig.content.spiderDog.walk.to
+                }),
+            frameRate: 15,
+            repeat: -1,
         });
     }
 }

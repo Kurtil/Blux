@@ -1,10 +1,10 @@
-import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
-import Entity from "./entity";
-import MainScene from "../scenes/mainScene";
-import FireBall from "./fireBall";
-import Player from "./player/player";
-import Heart from "./heart";
-import ExtraLife from "./extraLife";
+import spriteSheetConfig from "../../../assets/spriteSheets/spriteSheet.json";
+import Entity from "../entity";
+import MainScene from "../../scenes/mainScene";
+import FireBall from "../fireBall";
+import Player from "../player/player";
+import Heart from "../heart";
+import ExtraLife from "../extraLife";
 
 export default class Enemy extends Entity {
 
