@@ -34,5 +34,19 @@ export default class MainScenePause extends Phaser.Scene {
             this.scene.get("mainScene").input.keyboard.resetKeys();
             this.scene.stop();
         });
+
+        //Restart
+        this.add
+            .bitmapText(
+                (this.game.config.width as number) / 2, this.game.config.height as number / 2 + 100,
+                "nokia-white",
+                "R to Restart",
+                24)
+            .setOrigin(0.5, 0.5)
+            .setDepth(1);
+
+        this.input.keyboard.once("keydown-R", () => {
+            this.scene.start("mainScene");
+        });
     }
 }
