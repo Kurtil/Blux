@@ -10,22 +10,22 @@ export default class SpiderDog extends Entity {
     currentSpeed: number = null;
     regularSpeed = 30;
     chaseSpeed = 75;
-    graphics: Phaser.GameObjects.Graphics;
     frontSight = 100;
     backSight = 30;
-    debug = false;
-    chaseColor = 0xFFCCCC;
+    chaseTint = 0xFFCCCC;
     distanceToAttack = 10;
     attackHitBox: Phaser.GameObjects.Rectangle = null;
     attackSpeed = 800;
     attackAvailable = true;
+    target: Player;
 
-    constructor(scene: MainScene, x, y, key, rightDirection = true) {
+    constructor(scene: MainScene, x, y, key, rightDirection = true, target = scene.player) {
         super(scene, x, y, key, "SpiderDog", Phaser.Physics.Arcade.DYNAMIC_BODY,
             spriteSheetConfig.content.spiderDog.walk.from);
 
         this.setSize(14, 12).setOffset(1, 4);
         this.currentSpeed = this.regularSpeed;
+        this.target = target;
 
         // Initial state
         this.setVelocityX(this.currentSpeed);
@@ -36,40 +36,35 @@ export default class SpiderDog extends Entity {
 
         this.currentState = new WalkSpiderDogState(this);
 
-        if (this.debug) this.graphics = this.scene.add.graphics();
-
+        // Attack hitbox management
         this.attackHitBox = this.scene.add.rectangle(
             this.flipX ? this.x - 8 : this.x + 8,
             this.y - 3,
             5,
             5
         );
-
         this.scene.physics.world.enableBody(this.attackHitBox);
         (this.attackHitBox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
         this.disableAttackHitBox();
 
-        this.scene.physics.add.overlap(this.attackHitBox, (this.scene as MainScene).player,
-            (hitbox, player: Player) => {
+        this.scene.physics.add.overlap(this.target, this.attackHitBox,
+            (player: Player) => {
                 if (this.attackAvailable) {
                     player.onHit();
                     (this.scene as MainScene).updateHUD();
-                    this.attackAvailable = false;
-                    this.scene.time.addEvent({
-                        callbackScope: this,
-                        delay: this.attackSpeed,
-                        callback() {
-                            this.attackAvailable = true;
-                        }
-                    });
                 }
             });
     }
 
     update() {
-        if (this.seeTarget((this.scene as MainScene).player.body)) {
+        if (this.canSee()) {
             this.currentSpeed = this.chaseSpeed;
-            this.setTint(this.chaseColor);
+            this.setTint(this.chaseTint);
+        } else if (this.canSee(- this.backSight)) {
+            this.currentSpeed = this.chaseSpeed;
+            this.setTint(this.chaseTint);
+            this.flipX = !this.flipX;
+            this.setVelocityX(this.flipX ? - this.currentSpeed : this.currentSpeed);
         } else {
             this.currentSpeed = this.regularSpeed;
             this.clearTint();
@@ -77,15 +72,6 @@ export default class SpiderDog extends Entity {
 
         this.currentState.update();
 
-        if (this.debug) {
-            this.graphics.clear();
-            this.graphics.lineStyle(1, 0xffffff, 1);
-            const drawLine = new Phaser.Curves.Line(
-                new Phaser.Math.Vector2(this.flipX ? this.x + this.backSight : this.x - this.backSight, this.y),
-                new Phaser.Math.Vector2(this.flipX ? this.x - this.frontSight : this.x + this.frontSight, this.y)
-            );
-            drawLine.draw(this.graphics);
-        }
         this.updateAttackHitBox();
     }
 
@@ -93,18 +79,19 @@ export default class SpiderDog extends Entity {
         this.currentState = state;
     }
 
-    canAttack(target = (this.scene as MainScene).player): boolean {
-        return this.seeTarget(target.body, this.distanceToAttack);
+    canAttack(target = this.target): boolean {
+        return this.canSee(this.distanceToAttack, target);
     }
 
     hit() {
     }
 
     disableAttackHitBox() {
+        // TODO understand why onOverlap = false do not work to prevent overlap callback
         this.attackAvailable = false;
     }
 
-    enableAttackHitBox(): any {
+    enableAttackHitBox() {
         this.attackAvailable = true;
     }
 
@@ -113,7 +100,7 @@ export default class SpiderDog extends Entity {
         this.attackHitBox.y = this.y - 3;
     }
 
-    private seeTarget(target, distance = this.frontSight): boolean {
+    canSee(distance = this.frontSight, target = this.target): boolean {
         return Phaser.Geom.Intersects.LineToRectangle(
             new Phaser.Geom.Line(
                 this.x,
@@ -121,7 +108,7 @@ export default class SpiderDog extends Entity {
                 this.flipX ? this.x - distance : this.x + distance,
                 this.y
             ),
-            target
+            target.body
         );
     }
 }

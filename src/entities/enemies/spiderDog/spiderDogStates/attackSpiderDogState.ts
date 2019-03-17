@@ -19,7 +19,5 @@ export default class AttackSpiderDogState {
             this.spiderDog.disableAttackHitBox();
             this.spiderDog.setCurrentState(new WalkSpiderDogState(this.spiderDog));
         }
-
-        this.spiderDog.updateAttackHitBox();
     }
 }

@@ -16,7 +16,6 @@ export default class WalkSpiderDogState {
             this.spiderDog.setFrame(spriteSheetConfig.content.spiderDog.face.frame);
         } else if (this.spiderDog.body.blocked.right) {
             this.spiderDog.flipX = true;
-            this.spiderDog.setVelocityX(- this.spiderDog.currentSpeed);
             this.spiderDog.setFrame(spriteSheetConfig.content.spiderDog.face.frame);
         } else {
             this.spiderDog.setVelocityX(this.spiderDog.flipX ?
