@@ -39,7 +39,7 @@ export default class Enemy extends Entity {
         // hide life bar if full life
         const fullHealth = this.life === this.maxLifeCount;
         this.lifeBars.damage.setVisible(fullHealth ? false : true);
-        this.lifeBars.life.setAlpha(fullHealth ? 0 : 1);
+        this.lifeBars.life.setVisible(fullHealth ? false : true);
 
         if (!this.isDead) {
             const player = (this.scene as MainScene).player;
