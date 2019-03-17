@@ -21,6 +21,7 @@ export default class Player extends Entity {
     maxHealth = 3;
     shotGroup: Phaser.GameObjects.Group = null;
     score = 0;
+    invincible = false;
 
     get health() {
         return this._health;
@@ -73,29 +74,32 @@ export default class Player extends Entity {
         this.currentState = state;
     }
 
-    onHit() {
-        this.scene.cameras.main.shake(100, 0.001);
-        if (this.hitSoundAvailable) {
-            this.scene.sound.play("playerHit", { volume: 0.85 });
-            this.hitSoundAvailable = false;
-        }
-        this.scene.time.addEvent({
-            callback: () => this.hitSoundAvailable = true,
-            delay: 1000
-        });
-        this.health--;
-        if (this.health > 0) {
-            this.scene.tweens.add({
-                targets: this,
-                duration: 100,
-                alpha: 0,
-                onComplete() {
-                    this.alpha = 1;
-                },
-                onCompleteScope: this,
-                repeat: 3
+    onHit(power = 1) {
+        // TODO due to the player invicible state after hit, the hitSoundAvailable may be useless: remove it
+        if (this.affect({ health: -power })) {
+            this.scene.cameras.main.shake(100, 0.001);
+            if (this.hitSoundAvailable) {
+                this.scene.sound.play("playerHit", { volume: 0.85 });
+                this.hitSoundAvailable = false;
+            }
+            this.scene.time.addEvent({
+                callback: () => this.hitSoundAvailable = true,
+                delay: 1000
             });
-
+            if (this.health > 0) {
+                this.invincible = true;
+                this.scene.tweens.add({
+                    targets: this,
+                    duration: 100,
+                    alpha: 0,
+                    onComplete() {
+                        this.invincible = false;
+                        this.alpha = 1;
+                    },
+                    onCompleteScope: this,
+                    repeat: 3
+                });
+            }
         }
     }
 
@@ -108,6 +112,7 @@ export default class Player extends Entity {
         let affected = false;
         if (health) {
             if (health > 0) affected = this.healthUp(health);
+            if (health < 0) affected = this.healthDown(-health);
         }
         if (score) {
             this.score += score;
@@ -130,9 +135,18 @@ export default class Player extends Entity {
         this.isDead = true;
     }
 
-    private healthUp(health: number): boolean {
+    private healthDown(amount: any): boolean {
+        // TODO refacto this.invincible that not seems to work properly
+        if (!this.invincible) {
+            this.health -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    private healthUp(amount: number): boolean {
         if (this.health < this.maxHealth) {
-            this.health = Math.min(this.health + health, this.maxHealth);
+            this.health = Math.min(this.health + amount, this.maxHealth);
             return true;
         } else {
             return false;
