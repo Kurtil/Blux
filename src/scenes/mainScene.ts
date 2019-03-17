@@ -73,7 +73,7 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, enemyFactory.getEnemiesShotGroup(),
             (player: Player, fireball: FireBall) => {
                 player.onHit();
-                (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(player.health, player.maxHealth);
+                this.updateHUD();
                 fireball.hit();
             });
         this.physics.add.collider(enemyFactory.getEnemiesShotGroup(), this.ground,
@@ -86,13 +86,12 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.pickupGroup, (player: Player, pickup: PickUp | any) => {
             if (player.affect(pickup.getEffect())) {
                 pickup.onPickedUp();
-                (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerScore(player.score);
-                (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(player.health, player.maxHealth);
+                this.updateHUD();
             }
         });
 
         this.physics.add.collider(shotGroup, this.ground, (shot: PlayerShot) => shot.hit());
-        this.physics.add.overlap(shotGroup, enemyFactory.getEnemiesShotGroup(),
+        this.physics.add.collider(shotGroup, enemyFactory.getEnemiesShotGroup(),
             (playerShot: PlayerShot, fireBall: FireBall) => {
                 fireBall.hit();
                 playerShot.hit();
@@ -132,6 +131,11 @@ export default class MainScene extends Phaser.Scene {
         if (this.player.isDead) {
             this.cameras.main.fade(250, 30, 0, 0);
         }
+    }
+
+    updateHUD(): any {
+        (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerScore(this.player.score);
+        (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(this.player.health, this.player.maxHealth);
     }
 
     private setDebugGraphics(displayed: boolean) {
