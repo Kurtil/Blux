@@ -9,59 +9,60 @@ import PlayerShot from "./playerShot";
 
 export default class Player extends Entity {
 
-    cursors: Phaser.Input.Keyboard.CursorKeys;
+    cursors: Phaser.Input.Keyboard.CursorKeys = null;
+
+    currentState: State = null;
+
+    shotGroup: Phaser.GameObjects.Group = null;
+    shotPower = 1;
+
+    speed = 140;
+
+    jumpPower = 200;
     jumpDelay = 200;
     lastJumpTime = 0;
-    currentState: State;
+
     dying = false;
     isDead = false;
-    hitSoundAvailable = true;
-    canJump = true;
-    _health = 3;
+    health = 3;
     maxHealth = 3;
-    shotGroup: Phaser.GameObjects.Group = null;
-    score = 0;
+
     invincible = false;
+    hitLimitTime = 400;
 
-    get health() {
-        return this._health;
-    }
-
-    set health(value) {
-        this._health = value;
-        if (this._health <= 0) this.onDying();
-    }
+    score = 0;
 
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
 
-        this.setSize(10, 15).setOffset(3, 1);
-        this.setData("speed", 140);
-        this.setData("isDead", false);
-
-        this.setDragX(100);
+        this.setSize(10, 15).setOffset(3, 1).setDragX(100);
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
 
-        // Animations management
         this.createAnimations();
-
         this.shotGroup = this.scene.add.group();
-
         this.currentState = new IdlePlayerState(this);
     }
 
     update(time: number) {
-        if (this.dying) this.onDying();
-
-        this.currentState.update(this.handleUserInput(this.cursors), time);
-
-        if (this.isOutOfBounds()) this.onDead();
+        if (this.isOutOfBounds()) {
+            this.onDead();
+        } else {
+            if (this.health <= 0) {
+                this.onDying();
+            }
+            this.currentState.update(this.handleUserInput(this.cursors), time);
+        }
     }
 
-    jump(time) {
+    /**
+     * Jump if the previous jump was not to close in time
+     * @param time the current time
+     * @return true if the jump was performed
+     */
+    jump(time): boolean {
         if (time - this.lastJumpTime > this.jumpDelay) {
-            this.setVelocityY(-200);
+            this.setVelocityY(-this.jumpPower);
             this.scene.sound.play("playerJump", { detune: Math.random() * 50 - 25 });
             this.lastJumpTime = time;
             return true;
@@ -70,35 +71,16 @@ export default class Player extends Entity {
         }
     }
 
-    setCurrentState(state: State): any {
+    setCurrentState(state: State): void {
         this.currentState = state;
     }
 
     onHit(power = 1) {
-        // TODO due to the player invicible state after hit, the hitSoundAvailable may be useless: remove it
-        if (this.affect({ health: -power })) {
+        if (!this.dying && this.affect({ health: -power })) {
             this.scene.cameras.main.shake(100, 0.001);
-            if (this.hitSoundAvailable) {
-                this.scene.sound.play("playerHit", { volume: 0.85 });
-                this.hitSoundAvailable = false;
-            }
-            this.scene.time.addEvent({
-                callback: () => this.hitSoundAvailable = true,
-                delay: 1000
-            });
+            this.scene.sound.play("playerHit", { volume: 0.85 });
             if (this.health > 0) {
-                this.invincible = true;
-                this.scene.tweens.add({
-                    targets: this,
-                    duration: 100,
-                    alpha: 0,
-                    onComplete() {
-                        this.invincible = false;
-                        this.alpha = 1;
-                    },
-                    onCompleteScope: this,
-                    repeat: 3
-                });
+                this.setInvincibility();
             }
         }
     }
@@ -111,8 +93,7 @@ export default class Player extends Entity {
         const { health, maxHealth, score } = effect;
         let affected = false;
         if (health) {
-            if (health > 0) affected = this.healthUp(health);
-            if (health < 0) affected = this.healthDown(-health);
+            affected = this.updateHealth(health);
         }
         if (score) {
             this.score += score;
@@ -135,19 +116,42 @@ export default class Player extends Entity {
         this.isDead = true;
     }
 
-    private healthDown(amount: any): boolean {
-        // TODO refacto this.invincible that not seems to work properly
-        if (!this.invincible) {
-            this.health -= amount;
-            return true;
-        }
-        return false;
+    private setInvincibility() {
+        this.invincible = true;
+        const repeatTime = 3;
+        this.scene.tweens.add({
+            targets: this,
+            duration: this.hitLimitTime / repeatTime,
+            alpha: 0,
+            onComplete() {
+                this.invincible = false;
+                this.alpha = 1;
+            },
+            onCompleteScope: this,
+            repeat: repeatTime
+        });
     }
 
-    private healthUp(amount: number): boolean {
-        if (this.health < this.maxHealth) {
-            this.health = Math.min(this.health + amount, this.maxHealth);
-            return true;
+    /**
+     * Update health of the player if possible
+     * @param amount the amount to change
+     * @return true if health changed
+     */
+    private updateHealth(amount): boolean {
+        if (amount > 0) {
+            if (this.health < this.maxHealth) {
+                this.health = Math.min(this.health + amount, this.maxHealth);
+                return true;
+            } else {
+                return false;
+            }
+        } else if (amount < 0) {
+            if (!this.invincible) {
+                this.health += amount;
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -171,9 +175,10 @@ export default class Player extends Entity {
     }
 
     private onDying() {
-        // can be killed only one time :) TODO : do better
-        if (!this.dying) this.setCurrentState(new DiePLayerState(this));
-        this.dying = true;
+        if (!this.dying) {
+            this.setCurrentState(new DiePLayerState(this));
+            this.dying = true;
+        }
     }
 
     private handleUserInput(cursors): PlayerCommands {
