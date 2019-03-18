@@ -95,18 +95,6 @@
                 {
                  "gid":52,
                  "height":16,
-                 "id":42,
-                 "name":"enemy",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":880,
-                 "y":96
-                }, 
-                {
-                 "gid":52,
-                 "height":16,
                  "id":43,
                  "name":"enemy",
                  "rotation":0,
@@ -115,30 +103,6 @@
                  "width":16,
                  "x":880,
                  "y":144
-                }, 
-                {
-                 "gid":52,
-                 "height":16,
-                 "id":44,
-                 "name":"enemy",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":352,
-                 "y":304
-                }, 
-                {
-                 "gid":52,
-                 "height":16,
-                 "id":45,
-                 "name":"enemy",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":32,
-                 "y":496
                 }, 
                 {
                  "gid":52,
@@ -161,8 +125,68 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":80,
-                 "y":240
+                 "x":864,
+                 "y":96
+                }, 
+                {
+                 "gid":181,
+                 "height":16,
+                 "id":48,
+                 "name":"spiderDog",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":32,
+                 "y":496
+                }, 
+                {
+                 "gid":181,
+                 "height":16,
+                 "id":49,
+                 "name":"spiderDog",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":448,
+                 "y":304
+                }, 
+                {
+                 "gid":181,
+                 "height":16,
+                 "id":50,
+                 "name":"spiderDog",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":512,
+                 "y":496
+                }, 
+                {
+                 "gid":181,
+                 "height":16,
+                 "id":51,
+                 "name":"spiderDog",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":976,
+                 "y":496
+                }, 
+                {
+                 "gid":52,
+                 "height":16,
+                 "id":52,
+                 "name":"enemy",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":32,
+                 "y":352
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -416,7 +440,7 @@
          "y":0
         }],
  "nextlayerid":13,
- "nextobjectid":48,
+ "nextobjectid":53,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.2.1",
