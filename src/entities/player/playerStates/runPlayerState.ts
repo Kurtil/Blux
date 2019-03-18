@@ -14,7 +14,7 @@ export default class RunPlayerState implements PlayerState {
 
     update(commandes: PlayerCommands, time) {
         // is player in good state
-        if (!this.player.body.blocked.down) {
+        if (!this.player.body.blocked.down && !this.player.body.touching.down) {
             return this.player.setCurrentState(new AirPlayerState(this.player));
         }
         // player commands may change the state

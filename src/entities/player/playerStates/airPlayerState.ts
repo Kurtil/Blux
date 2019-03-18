@@ -18,7 +18,7 @@ export default class AirPlayerState implements PlayerState {
             this.player.anims.play("jump");
         }
         // is player in good state
-        if (this.player.body.blocked.down) {
+        if (this.player.body.blocked.down || this.player.body.touching.down) {
             if (this.player.body.velocity.x === 0) {
                 return this.player.setCurrentState(new IdlePlayerState(this.player));
             } else {
