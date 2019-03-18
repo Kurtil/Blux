@@ -15,15 +15,17 @@ export default class SpiderDog extends Entity {
     chaseTint = 0xFFCCCC;
     distanceToAttack = 10;
     attackHitBox: Phaser.GameObjects.Rectangle = null;
-    attackSpeed = 800;
-    attackAvailable = true;
+    attackSpeed = 500;
     target: Player;
+    attackAvailable = true;
+    attackHitBoxGroup: Phaser.GameObjects.Group;
 
     constructor(scene: MainScene, x, y, key, rightDirection = true, target = scene.player) {
         super(scene, x, y, key, "SpiderDog", Phaser.Physics.Arcade.DYNAMIC_BODY,
             spriteSheetConfig.content.spiderDog.walk.from);
 
-        this.setSize(14, 12).setOffset(1, 4);
+        // TODO try to set friction (and make it work) to allow the player to ride
+        this.setSize(14, 12).setOffset(1, 4); //.setImmovable().setFriction(1, 0);
         this.currentSpeed = this.regularSpeed;
         this.target = target;
 
@@ -37,26 +39,16 @@ export default class SpiderDog extends Entity {
         this.currentState = new WalkSpiderDogState(this);
 
         // Attack hitbox management
-        this.attackHitBox = this.scene.add.rectangle(
-            this.flipX ? this.x - 8 : this.x + 8,
-            this.y - 3,
-            5,
-            5
-        );
-        this.scene.physics.world.enableBody(this.attackHitBox);
-        (this.attackHitBox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
-        this.disableAttackHitBox();
+        this.attackHitBoxGroup = this.scene.add.group();
 
-        this.scene.physics.add.overlap(this.target, this.attackHitBox,
+        this.scene.physics.add.overlap(this.target, this.attackHitBoxGroup,
             (player: Player) => {
-                if (this.attackAvailable) {
-                    player.onHit();
-                    (this.scene as MainScene).updateHUD();
-                }
+                player.onHit();
+                (this.scene as MainScene).updateHUD();
             });
     }
 
-    update() {
+    update(time) {
         if (this.canSee()) {
             this.currentSpeed = this.chaseSpeed;
             this.setTint(this.chaseTint);
@@ -70,9 +62,21 @@ export default class SpiderDog extends Entity {
             this.clearTint();
         }
 
-        this.currentState.update();
+        this.currentState.update(time);
 
         this.updateAttackHitBox();
+    }
+
+    addHitBox() {
+        const hitBox = this.scene.add.rectangle(
+            this.flipX ? this.x - 8 : this.x + 8,
+            this.y - 3,
+            5,
+            5
+        );
+        this.scene.physics.world.enableBody(hitBox);
+        (hitBox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+        return hitBox;
     }
 
     setCurrentState(state): void {
@@ -87,17 +91,23 @@ export default class SpiderDog extends Entity {
     }
 
     disableAttackHitBox() {
-        // TODO understand why onOverlap = false do not work to prevent overlap callback
-        this.attackAvailable = false;
+        (this.attackHitBox.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
+    }
+
+    isAttackHitBoxEnabled() {
+        return this.attackHitBox ?
+            !(this.attackHitBox.body as Phaser.Physics.Arcade.Body).checkCollision.none : false;
     }
 
     enableAttackHitBox() {
-        this.attackAvailable = true;
+        (this.attackHitBox.body as Phaser.Physics.Arcade.Body).checkCollision.none = false;
     }
 
     updateAttackHitBox() {
-        this.attackHitBox.x = this.flipX ? this.x - 8 : this.x + 8;
-        this.attackHitBox.y = this.y - 3;
+        if (this.attackHitBox) {
+            this.attackHitBox.x = this.flipX ? this.x - 8 : this.x + 8;
+            this.attackHitBox.y = this.y - 3;
+        }
     }
 
     canSee(distance = this.frontSight, target = this.target): boolean {
