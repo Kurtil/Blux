@@ -6,6 +6,7 @@ import IdlePlayerState from "./playerStates/idlePlayerState";
 import PlayerCommands from "./playerCommands";
 import DiePLayerState from "./playerStates/diePlayerState";
 import PlayerShot from "./playerShot";
+import Sword from "../sword";
 
 export default class Player extends Entity {
 
@@ -33,6 +34,8 @@ export default class Player extends Entity {
 
     score = 0;
 
+    weapon: Sword = null;
+
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
 
@@ -40,9 +43,14 @@ export default class Player extends Entity {
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
 
+        this.setDepth(1);
+
         this.createAnimations();
         this.shotGroup = this.scene.add.group();
         this.currentState = new IdlePlayerState(this);
+
+        this.weapon = new Sword(this.scene, this.x, this.y, spriteSheetConfig.name);
+        this.weapon.setVisible(false);
     }
 
     update(time: number) {
@@ -113,7 +121,9 @@ export default class Player extends Entity {
     }
 
     meleeAttack() {
-        this.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 50 - 25 });
+        this.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 200 - 100 });
+        this.scene.physics.moveTo(this, this.flipX ? this.x - this.width * 2 : this.x + this.width * 2,
+            this.y, 200, 100);
     }
 
     onDead(): any {
@@ -137,6 +147,13 @@ export default class Player extends Entity {
         });
     }
 
+    updadeWeapon(x, y) {
+        if (this.weapon) {
+            this.weapon.x = x + (this.flipX ? - 12 : + 12);
+            this.weapon.y = y;
+            this.weapon.flipX = this.flipX;
+        }
+    }
     /**
      * Update health of the player if possible
      * @param amount the amount to change
