@@ -20,13 +20,14 @@ export default class SpiderDog extends Entity {
     attackHitBox: Phaser.GameObjects.Rectangle = null;
     attackSpeed = 500;
     power = 1;
-    target: Player;
+    target: Player = null;
     attackAvailable = true;
-    attackHitBoxGroup: Phaser.GameObjects.Group;
-    healthBar: HealthBar;
+    attackHitBoxGroup: Phaser.GameObjects.Group = null;
+    healthBar: HealthBar = null;
     health = 3;
     maxHealth = 3;
     isDead = false;
+    walkSound: Phaser.Sound.BaseSound = null;
 
     constructor(scene: MainScene, x, y, key, rightDirection = true, target = scene.player) {
         super(scene, x, y, key, "SpiderDog", Phaser.Physics.Arcade.DYNAMIC_BODY,
@@ -36,6 +37,8 @@ export default class SpiderDog extends Entity {
         this.setSize(14, 12).setOffset(1, 4); //.setImmovable().setFriction(1, 0);
         this.currentSpeed = this.regularSpeed;
         this.target = target;
+
+        this.walkSound = this.scene.sound.add("spiderDogWalk");
 
         // Initial state
         this.setVelocityX(this.currentSpeed);
@@ -140,7 +143,7 @@ export default class SpiderDog extends Entity {
     }
 
     attack() {
-        this.scene.sound.play("spiderDogAttack", { volume: 0.5 });
+        this.scene.sound.play("spiderDogAttack", { volume: 0.4 });
         return this.power;
     }
 
