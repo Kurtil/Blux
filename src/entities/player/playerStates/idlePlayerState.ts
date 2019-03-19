@@ -16,23 +16,27 @@ export default class IdlePlayerState implements PlayerState {
     update(commandes: PlayerCommands, time) {
         // is player in good state
         if (!this.player.body.blocked.down && !this.player.body.touching.down) {
-            this.player.setCurrentState(new AirPlayerState(this.player));
+            this.nextState(new AirPlayerState(this.player));
         }
         // player commands may change the state
         if (commandes.up) {
-            if (this.player.jump(time)) return this.player.setCurrentState(new AirPlayerState(this.player));
+            if (this.player.jump(time)) return this.nextState(new AirPlayerState(this.player));
         }
         if (commandes.left && !this.player.body.blocked.left) {
             this.player.setVelocityX(-140);
             this.player.setFlipX(true);
-            return this.player.setCurrentState(new RunPlayerState(this.player));
+            return this.nextState(new RunPlayerState(this.player));
         } else if (commandes.right && !this.player.body.blocked.right) {
             this.player.setVelocityX(140);
             this.player.setFlipX(false);
-            return this.player.setCurrentState(new RunPlayerState(this.player));
+            return this.nextState(new RunPlayerState(this.player));
         }
         if (commandes.attack) {
-            return this.player.setCurrentState(new AttackPLayerState(this.player));
+            return this.nextState(new AttackPLayerState(this.player));
         }
+    }
+
+    nextState(nextState) {
+        this.player.setCurrentState(nextState);
     }
 }

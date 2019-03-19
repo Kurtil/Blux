@@ -15,11 +15,11 @@ export default class RunPlayerState implements PlayerState {
     update(commandes: PlayerCommands, time) {
         // is player in good state
         if (!this.player.body.blocked.down && !this.player.body.touching.down) {
-            return this.player.setCurrentState(new AirPlayerState(this.player));
+            return this.nextState(new AirPlayerState(this.player));
         }
         // player commands may change the state
         if (commandes.up) {
-            if (this.player.jump(time)) return this.player.setCurrentState(new AirPlayerState(this.player));
+            if (this.player.jump(time)) return this.nextState(new AirPlayerState(this.player));
         }
         if (commandes.left) {
             this.player.setVelocityX(-140);
@@ -30,7 +30,11 @@ export default class RunPlayerState implements PlayerState {
         }
         if (!commandes.left && !commandes.right) {
             this.player.setVelocityX(0);
-            return this.player.setCurrentState(new IdlePlayerState(this.player));
+            return this.nextState(new IdlePlayerState(this.player));
         }
+    }
+
+    nextState(nextState) {
+        this.player.setCurrentState(nextState);
     }
 }

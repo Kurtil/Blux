@@ -20,9 +20,9 @@ export default class AirPlayerState implements PlayerState {
         // is player in good state
         if (this.player.body.blocked.down || this.player.body.touching.down) {
             if (this.player.body.velocity.x === 0) {
-                return this.player.setCurrentState(new IdlePlayerState(this.player));
+                return this.nextState(new IdlePlayerState(this.player));
             } else {
-                return this.player.setCurrentState(new RunPlayerState(this.player));
+                return this.nextState(new RunPlayerState(this.player));
             }
         }
         // player commands may change the state
@@ -36,5 +36,9 @@ export default class AirPlayerState implements PlayerState {
         if (!commandes.left && !commandes.right) {
             this.player.setVelocityX(0);
         }
+    }
+
+    nextState(nextState) {
+        this.player.setCurrentState(nextState);
     }
 }
