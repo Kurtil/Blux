@@ -3,6 +3,9 @@ import MainScene from "../../../scenes/mainScene";
 import spriteSheetConfig from "../../../../assets/spriteSheets/spriteSheet.json";
 import WalkSpiderDogState from "./spiderDogStates/walkSpiderDogState";
 import Player from "../../player/player";
+import HealthBar from "../../../utils/healthBar";
+import Heart from "../../heart";
+import ExtraLife from "../../extraLife";
 
 export default class SpiderDog extends Entity {
 
@@ -19,6 +22,10 @@ export default class SpiderDog extends Entity {
     target: Player;
     attackAvailable = true;
     attackHitBoxGroup: Phaser.GameObjects.Group;
+    healthBar: HealthBar;
+    health = 3;
+    maxHealth = 3;
+    isDead = false;
 
     constructor(scene: MainScene, x, y, key, rightDirection = true, target = scene.player) {
         super(scene, x, y, key, "SpiderDog", Phaser.Physics.Arcade.DYNAMIC_BODY,
@@ -46,25 +53,33 @@ export default class SpiderDog extends Entity {
                 player.onHit();
                 (this.scene as MainScene).updateHUD();
             });
+
+        // life management
+        this.healthBar = new HealthBar(this.scene, this.x, this.y - 10, this.width, 2, this.health, this.maxHealth);
     }
 
     update(time) {
-        if (this.canSee()) {
-            this.currentSpeed = this.chaseSpeed;
-            this.setTint(this.chaseTint);
-        } else if (this.canSee(- this.backSight)) {
-            this.currentSpeed = this.chaseSpeed;
-            this.setTint(this.chaseTint);
-            this.flipX = !this.flipX;
-            this.setVelocityX(this.flipX ? - this.currentSpeed : this.currentSpeed);
-        } else {
-            this.currentSpeed = this.regularSpeed;
-            this.clearTint();
+        if (!this.isDead) {
+            this.healthBar.setVisible(this.health < this.maxHealth);
+
+            if (this.canSee()) {
+                this.currentSpeed = this.chaseSpeed;
+                this.setTint(this.chaseTint);
+            } else if (this.canSee(- this.backSight)) {
+                this.currentSpeed = this.chaseSpeed;
+                this.setTint(this.chaseTint);
+                this.flipX = !this.flipX;
+                this.setVelocityX(this.flipX ? - this.currentSpeed : this.currentSpeed);
+            } else {
+                this.currentSpeed = this.regularSpeed;
+                this.clearTint();
+            }
+
+            this.currentState.update(time);
+
+            this.updateAttackHitBox();
+            this.healthBar.updateHealthBarPosition(this.x, this.y - 10);
         }
-
-        this.currentState.update(time);
-
-        this.updateAttackHitBox();
     }
 
     addHitBox() {
@@ -88,6 +103,7 @@ export default class SpiderDog extends Entity {
     }
 
     hit() {
+        this.onHit();
     }
 
     disableAttackHitBox() {
@@ -120,5 +136,36 @@ export default class SpiderDog extends Entity {
             ),
             target.body
         );
+    }
+
+    private onHit() {
+        this.health--;
+        this.healthBar.updateHealthBar(this.health);
+        if (this.health === 0) {
+            this.onDead();
+        }
+    }
+
+    private onDead() {
+        if (this.attackHitBox) {
+            this.attackHitBox.destroy();
+        }
+        this.healthBar.destroy();
+        this.disableBody();
+        this.isDead = true;
+        this.play("enemyDestroy");
+        this.scene.sound.play("enemyDestroy", { volume: 0.5 });
+        this.once("animationcomplete-enemyDestroy", () => {
+            const randomNumber = Phaser.Math.Between(1, 12);
+            if (randomNumber <= 3) {
+                (this.scene as MainScene).pickupGroup.add(
+                    new Heart(this.scene, this.x, this.y, spriteSheetConfig.name));
+            }
+            else if (randomNumber === 12) {
+                (this.scene as MainScene).pickupGroup.add(
+                    new ExtraLife(this.scene, this.x, this.y, spriteSheetConfig.name));
+            }
+            this.destroy();
+        });
     }
 }
