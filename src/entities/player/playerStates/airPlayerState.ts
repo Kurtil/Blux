@@ -3,6 +3,7 @@ import PlayerCommands from "../playerCommands";
 import Player from "../player";
 import RunPlayerState from "./runPlayerState";
 import IdlePlayerState from "./idlePlayerState";
+import MeleeAttackPlayerState from "./meleeAttackPlayerState";
 
 export default class AirPlayerState implements PlayerState {
     player: Player = null;
@@ -27,14 +28,18 @@ export default class AirPlayerState implements PlayerState {
         }
         // player commands may change the state
         if (commandes.left) {
-            this.player.setVelocityX(-140);
+            this.player.setVelocityX(-this.player.airSpeed);
             this.player.setFlipX(true);
         } else if (commandes.right) {
-            this.player.setVelocityX(140);
+            this.player.setVelocityX(this.player.airSpeed);
             this.player.setFlipX(false);
         }
         if (!commandes.left && !commandes.right) {
             this.player.setVelocityX(0);
+        }
+
+        if (commandes.meleeAttack) {
+            return this.nextState(new MeleeAttackPlayerState(this.player));
         }
     }
 

@@ -17,6 +17,12 @@
                 "from": 190,
                 "to": 197
             }
+        },
+        "player": {
+            "meleeAttack": {
+                "from": 16,
+                "to": 19
+            }
         }
     }
 }

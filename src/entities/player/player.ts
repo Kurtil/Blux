@@ -10,13 +10,14 @@ import PlayerShot from "./playerShot";
 export default class Player extends Entity {
 
     cursors: Phaser.Input.Keyboard.CursorKeys = null;
-
+    xKey: Phaser.Input.Keyboard.Key = null;
     currentState: State = null;
 
     shotGroup: Phaser.GameObjects.Group = null;
     shotPower = 1;
 
     speed = 140;
+    airSpeed = 120;
 
     jumpPower = 200;
     jumpDelay = 200;
@@ -111,6 +112,10 @@ export default class Player extends Entity {
         this.scene.sound.play("playerAttack", { detune: Math.random() * 50 - 25 });
     }
 
+    meleeAttack() {
+        this.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 50 - 25 });
+    }
+
     onDead(): any {
         this.scene.cameras.main.shake(250, 0.005);
         this.isDead = true;
@@ -181,12 +186,13 @@ export default class Player extends Entity {
         }
     }
 
-    private handleUserInput(cursors): PlayerCommands {
+    private handleUserInput(cursors: Phaser.Input.Keyboard.CursorKeys): PlayerCommands {
         return {
             up: cursors.up.isDown,
             right: cursors.right.isDown,
             left: cursors.left.isDown,
-            attack: cursors.space.isDown
+            meleeAttack: cursors.space.isDown,
+            attack: cursors.down.isDown,
         };
     }
 
@@ -236,6 +242,15 @@ export default class Player extends Entity {
             key: "playerShotExplodes",
             frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 150, end: 163 }),
             frameRate: 50,
+        });
+        this.scene.anims.create({
+            key: "meleeAttack",
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name,
+                {
+                    start: spriteSheetConfig.content.player.meleeAttack.from,
+                    end: spriteSheetConfig.content.player.meleeAttack.to
+                }),
+            frameRate: 24,
         });
     }
 }
