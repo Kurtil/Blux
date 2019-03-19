@@ -1,0 +1,22 @@
+{
+    "name": "spriteSheet",
+    "content": {
+        "spiderDog": {
+            "walk": {
+                "from": 180,
+                "to": 185
+            },
+            "attack": {
+                "from": 186,
+                "to": 189
+            },
+            "face": {
+                "frame": 179
+            },
+            "dying": {
+                "from": 190,
+                "to": 197
+            }
+        }
+    }
+}
