@@ -1,41 +1,42 @@
-import Player from "../entities/player/player";
+import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
 
 export default class MainSceneHUD extends Phaser.Scene {
 
     infos: Phaser.GameObjects.BitmapText = null;
     displayinInfos = false;
     score: Phaser.GameObjects.BitmapText = null;
-    initMessage = '0 / 10';
-    player: Player = null;
+    initMessage = "0 / 10";
+    playerHealth: number = null;
+    playerMaxHealth: number = null;
     lifes: Phaser.GameObjects.Sprite[] = null;
     gem: Phaser.GameObjects.Sprite;
     infoRect: any;
 
     constructor() {
-        super({ key: 'mainSceneHUD' });
+        super({ key: "mainSceneHUD" });
     }
 
-    init({ player, playerScore, lifes }) {
+    init({ playerHealth, playerMaxHealth, playerScore }) {
         if (playerScore) this.initMessage = `${playerScore} / 10`;
-        // if (lifes) this.lifes = lifes;
-        if (player) this.player = player;
+        if (playerHealth) this.playerHealth = playerHealth;
+        if (playerMaxHealth) this.playerMaxHealth = playerMaxHealth;
     }
 
     create() {
 
-        this.score = this.add.bitmapText(20, 10, 'nokia-white', this.initMessage, 24);
-        this.gem = this.add.sprite(this.score.width + 2 * 20, 20, 'spriteSheet', 80)
+        this.score = this.add.bitmapText(20, 10, "nokia-white", this.initMessage, 24);
+        this.gem = this.add.sprite(this.score.width + 2 * 20, 20, spriteSheetConfig.name, 80)
             .setScale(2)
             .setOrigin(0, 0.5);
-        this.add.rectangle(5, 5, this.score.width + this.gem.width + 3 * 20, this.score.height + 2 * 5, 0x443333)
+        this.add.rectangle(5, 5, this.score.width + this.gem.width + 3 * 20,
+            this.score.height + 2 * 5, 0x443333)
             .setOrigin(0, 0)
             .setDepth(-1);
-        // this.add.container(400, 300, [this.gem, this.score]);
 
         this.lifes = [];
-        this.displayLife(this.player.life, this.player.maxLife);
+        this.displayLife(this.playerHealth, this.playerMaxHealth);
 
-        this.infos = this.add.bitmapText(10, 566, 'nokia-white', '', 24);
+        this.infos = this.add.bitmapText(10, 566, "nokia-white", "", 24);
         this.infoRect = this.add.rectangle(0, 0, 0, 0, 0x443333).setVisible(false).setDepth(-1);
         this.updateInfoRect();
     }
@@ -64,7 +65,7 @@ export default class MainSceneHUD extends Phaser.Scene {
             this.time.addEvent({
                 delay: 300,
                 callback: () => {
-                    this.infos.setText('');
+                    this.infos.setText("");
                     this.displayinInfos = false;
                     this.infoRect.setVisible(false);
                 }
@@ -81,9 +82,11 @@ export default class MainSceneHUD extends Phaser.Scene {
         this.lifes = [];
         for (let i = 0; i < maxLife; i++) {
             if (i + 1 > life) {
-                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i, 20, 'spriteSheet', 96).setScale(2));
+                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i,
+                    20, spriteSheetConfig.name, 96).setScale(2));
             } else {
-                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i, 20, 'spriteSheet', 95).setScale(2));
+                this.lifes.push(this.add.sprite(firstPosition - (spaceBetweenHeart + heartWidth) * i,
+                    20, spriteSheetConfig.name, 95).setScale(2));
             }
         }
     }

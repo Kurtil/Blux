@@ -13,7 +13,7 @@ export default class FireBall extends Entity {
 
         (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
-        this.play('fireBall');
+        this.play("fireBall");
         this.setSize(6, 6);
         var dx = target.x - this.x;
         var dy = target.y - this.y;
@@ -27,15 +27,15 @@ export default class FireBall extends Entity {
 
     hit() {
         this.disableBody();
-        this.play('fireBallExplodes');
+        this.play("fireBallExplodes");
         // the sound should be lounder if the player is closer
         const distanceToPlayer = Phaser.Math.Distance.Between(
             this.target.x,
             this.target.y,
             this.x,
             this.y);
-        this.scene.sound.play('explodes', { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
-        this.once('animationcomplete-fireBallExplodes', () => this.destroy());
+        this.scene.sound.play("explodes", { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
+        this.once("animationcomplete-fireBallExplodes", () => this.destroy());
     }
 
 }

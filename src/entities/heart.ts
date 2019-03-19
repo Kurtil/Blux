@@ -1,6 +1,9 @@
 import Entity from "./entity";
+import PickUp from "./pickup";
 
-export default class Heart extends Entity {
+export default class Heart extends Entity implements PickUp {
+
+    effect = { health: 1 };
 
     constructor(scene, x, y, key) {
         super(scene, x + 1, y + 1, key, "Gem", Phaser.Physics.Arcade.DYNAMIC_BODY, 95);
@@ -17,8 +20,12 @@ export default class Heart extends Entity {
         });
     }
 
+    getEffect() {
+        return this.effect;
+    }
+
     onPickedUp(): any {
-        this.scene.sound.play('lifeUp');
+        this.scene.sound.play("healthUp");
         this.destroy();
     }
 }

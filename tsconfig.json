@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "resolveJsonModule": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "sourceMap": true
+    }
+}
