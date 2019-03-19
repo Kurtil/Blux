@@ -20,7 +20,6 @@ export default class Enemy extends Entity {
     maxLifeCount = 3;
     life = 3;
     lifeBars: { life: Phaser.GameObjects.Graphics, damage: Phaser.GameObjects.Graphics };
-    green: Phaser.GameObjects.Graphics;
     isDead = false;
 
     constructor(scene: MainScene, x, y, key, shotGroup) {
