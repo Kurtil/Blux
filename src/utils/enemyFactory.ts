@@ -88,5 +88,14 @@ export default class EnemyFactory {
             frameRate: 15,
             repeat: -1,
         });
+        this.scene.anims.create({
+            key: "spiderDogDying",
+            frames: this.scene.anims.generateFrameNumbers(this.textureKey,
+                {
+                    start: spriteSheetConfig.content.spiderDog.dying.from,
+                    end: spriteSheetConfig.content.spiderDog.dying.to
+                }),
+            frameRate: 12,
+        });
     }
 }

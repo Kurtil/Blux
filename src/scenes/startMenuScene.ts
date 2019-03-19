@@ -26,6 +26,8 @@ export default class StartMenuScene extends Phaser.Scene {
         this.load.audio("fire", "assets/sounds/fire.wav");
         this.load.audio("healthUp", "assets/sounds/healthUp.wav");
         this.load.audio("explodes", "assets/sounds/explodes.wav");
+        this.load.audio("spiderDogWalk", "assets/sounds/spiderDogWalk.wav");
+        this.load.audio("spiderDogAttack", "assets/sounds/spiderDogAttack.wav");
         this.load.audio("victory", "assets/sounds/victory.wav");
         this.load.audio("mainTheme", "assets/sounds/mainTheme.wav");
         this.load.bitmapFont("nokia-black", "assets/fonts/bitmap/nokia16black.png", "assets/fonts/bitmap/nokia16.xml");

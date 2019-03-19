@@ -19,6 +19,7 @@ export default class SpiderDog extends Entity {
     distanceToAttack = 10;
     attackHitBox: Phaser.GameObjects.Rectangle = null;
     attackSpeed = 500;
+    power = 1;
     target: Player;
     attackAvailable = true;
     attackHitBoxGroup: Phaser.GameObjects.Group;
@@ -50,7 +51,7 @@ export default class SpiderDog extends Entity {
 
         this.scene.physics.add.overlap(this.target, this.attackHitBoxGroup,
             (player: Player) => {
-                player.onHit();
+                player.onHit(this.attack());
                 (this.scene as MainScene).updateHUD();
             });
 
@@ -138,6 +139,15 @@ export default class SpiderDog extends Entity {
         );
     }
 
+    attack() {
+        this.scene.sound.play("spiderDogAttack", { volume: 0.5 });
+        return this.power;
+    }
+
+    playWalkSound(): any {
+        this.scene.sound.play("spiderDogWalk", { loop: true });
+    }
+
     private onHit() {
         this.health--;
         this.healthBar.updateHealthBar(this.health);
@@ -153,9 +163,9 @@ export default class SpiderDog extends Entity {
         this.healthBar.destroy();
         this.disableBody();
         this.isDead = true;
-        this.play("enemyDestroy");
-        this.scene.sound.play("enemyDestroy", { volume: 0.5 });
-        this.once("animationcomplete-enemyDestroy", () => {
+        this.play("spiderDogDying");
+        this.scene.sound.play("enemyDestroy", { volume: 0.5, detune: 750 });
+        this.once("animationcomplete-spiderDogDying", () => {
             const randomNumber = Phaser.Math.Between(1, 12);
             if (randomNumber <= 3) {
                 (this.scene as MainScene).pickupGroup.add(
