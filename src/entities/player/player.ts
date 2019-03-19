@@ -78,7 +78,7 @@ export default class Player extends Entity {
     onHit(power = 1) {
         if (!this.dying && this.affect({ health: -power })) {
             this.scene.cameras.main.shake(100, 0.001);
-            this.scene.sound.play("playerHit", { volume: 0.85 });
+            this.scene.sound.play("playerHit", { volume: 0.5 });
             if (this.health > 0) {
                 this.setInvincibility();
             }

@@ -32,7 +32,7 @@ export default class MainScene extends Phaser.Scene {
         this.sys.sound.volume = 0.2;
         // this.cameras.main.roundPixels = true;
 
-        this.sound.play("mainTheme", { volume: 0.25, loop: true });
+        this.sound.play("mainTheme", { volume: 0.20, loop: true });
 
         // Map management
         this.map = this.make.tilemap({ key: "map" });
