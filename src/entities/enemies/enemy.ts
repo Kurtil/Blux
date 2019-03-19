@@ -5,6 +5,7 @@ import FireBall from "../fireBall";
 import Player from "../player/player";
 import Heart from "../heart";
 import ExtraLife from "../extraLife";
+import HealthBar from "../../utils/healthBar";
 
 export default class Enemy extends Entity {
 
@@ -17,9 +18,9 @@ export default class Enemy extends Entity {
     graphics: any;
     debug = false;
     attackDistanceLimit = 100;
-    maxLifeCount = 3;
-    life = 3;
-    lifeBars: { life: Phaser.GameObjects.Graphics, damage: Phaser.GameObjects.Graphics };
+    maxHealth = 4;
+    health = 4;
+    healthBar: HealthBar = null;
     isDead = false;
 
     constructor(scene: MainScene, x, y, key, shotGroup) {
@@ -31,14 +32,11 @@ export default class Enemy extends Entity {
         if (this.debug) this.graphics = this.scene.add.graphics();
 
         // life management
-        this.drawLifeBars();
+        this.healthBar = new HealthBar(this.scene, this.x, this.y - 10, this.width, 2, this.health, this.maxHealth);
     }
 
     update(time) {
-        // hide life bar if full life
-        const fullHealth = this.life === this.maxLifeCount;
-        this.lifeBars.damage.setVisible(fullHealth ? false : true);
-        this.lifeBars.life.setVisible(fullHealth ? false : true);
+        this.healthBar.setVisible(this.health < this.maxHealth);
 
         if (!this.isDead) {
             const player = (this.scene as MainScene).player;
@@ -73,15 +71,15 @@ export default class Enemy extends Entity {
     }
 
     private onHit() {
-        this.life--;
-        this.updateLifeBar();
-        if (this.life === 0) {
+        this.health--;
+        this.healthBar.updateHealthBar(this.health);
+        if (this.health === 0) {
             this.onDead();
         }
     }
 
     private onDead() {
-        this.clearLifeBar();
+        this.healthBar.destroy();
         this.disableBody();
         this.isDead = true;
         this.play("enemyDestroy");
@@ -98,32 +96,6 @@ export default class Enemy extends Entity {
             }
             this.destroy();
         });
-    }
-
-    /**
-     * Draw the green and the red (bottom) life bars
-     */
-    private drawLifeBars(): any {
-        this.lifeBars = {
-            damage: this.scene.add.graphics({ fillStyle: { color: 0xff0000 } })
-                .fillRectShape(this.getLifeRectangle(true)),
-            life: this.scene.add.graphics({ fillStyle: { color: 0x00ff00 } }).fillRectShape(this.getLifeRectangle())
-        };
-    }
-
-    private updateLifeBar() {
-        this.lifeBars.life.destroy();
-        this.lifeBars.life = this.scene.add.graphics({ fillStyle: { color: 0x00ff00 } })
-            .fillRectShape(this.getLifeRectangle());
-    }
-
-    private clearLifeBar() {
-        this.lifeBars.life.destroy();
-        this.lifeBars.damage.destroy();
-    }
-
-    private getLifeRectangle(max = false): Phaser.Geom.Rectangle {
-        return new Phaser.Geom.Rectangle(this.x + 6, this.y - 11, max ? -12 : -12 * (this.life / this.maxLifeCount), 2);
     }
 
     private attack(player: Player) {
