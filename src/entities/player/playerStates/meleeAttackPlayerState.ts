@@ -62,8 +62,11 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.player.shotGroup.add(this.hitbox);
         (this.hitbox as any).hit = () => {
             if (this.hitPower > 0) {
+                // TODO may be implemented a better way
                 this.player.meleeAttackSound();
-                return this.hitPower--;
+                const power = this.hitPower;
+                this.hitPower = 0;
+                return power;
             } else {
                 return 0;
             }

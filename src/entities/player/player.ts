@@ -122,7 +122,7 @@ export default class Player extends Entity {
             affected = true;
         }
         if (weapon) {
-            this.weapon = new weapon(this.scene, this.x, this.y, spriteSheetConfig.name);
+            this.equip(new weapon(this.scene, this.x, this.y, spriteSheetConfig.name));
             affected = true;
         }
         return affected;
@@ -216,6 +216,13 @@ export default class Player extends Entity {
                 this.health = this.maxHealth;
             }
         }
+    }
+
+    private equip(weapon): any {
+        if (this.weapon) {
+            this.weapon.destroy();
+        }
+        this.weapon = weapon;
     }
 
     private isOutOfBounds(): any {

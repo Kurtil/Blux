@@ -26,6 +26,12 @@
         },
         "sword": {
             "frame": 37
+        },
+        "forrestSword": {
+            "frame": 38
+        },
+        "hellSword": {
+            "frame": 39
         }
     }
 }

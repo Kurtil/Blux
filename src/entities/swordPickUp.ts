@@ -5,11 +5,11 @@ import Sword from "./sword";
 
 export default class SwordPickUp extends Entity implements PickUp {
 
-    effect = { weapon: Sword };
+    effect = null;
 
-    constructor(scene, x, y, key) {
+    constructor(scene, x, y, key, frame, sword) {
         super(scene, x, y - 4, key, "Sword", Phaser.Physics.Arcade.DYNAMIC_BODY,
-            spriteSheetConfig.content.sword.frame);
+            frame);
 
         (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
         this.angle = -45;
@@ -22,6 +22,8 @@ export default class SwordPickUp extends Entity implements PickUp {
             duration: 200,
             ease: "InOut"
         });
+
+        this.effect = { weapon: sword };
     }
 
     getEffect() {
