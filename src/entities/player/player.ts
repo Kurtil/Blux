@@ -52,8 +52,6 @@ export default class Player extends Entity {
         this.createAnimations();
         this.shotGroup = this.scene.add.group();
         this.currentState = new IdlePlayerState(this);
-
-        this.weapon = new Sword(this.scene, this.x, this.y, spriteSheetConfig.name);
     }
 
     update(time: number) {
@@ -110,7 +108,7 @@ export default class Player extends Entity {
     * @returns true if the effect affected the player, false if no effect
     */
     affect(effect): boolean {
-        const { health, maxHealth, score } = effect;
+        const { health, maxHealth, score, weapon } = effect;
         let affected = false;
         if (health) {
             affected = this.updateHealth(health);
@@ -121,6 +119,10 @@ export default class Player extends Entity {
         }
         if (maxHealth) {
             this.updateMaxHealth(maxHealth);
+            affected = true;
+        }
+        if (weapon) {
+            this.weapon = new weapon(this.scene, this.x, this.y, spriteSheetConfig.name);
             affected = true;
         }
         return affected;

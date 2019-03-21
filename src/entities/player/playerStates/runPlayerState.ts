@@ -34,7 +34,7 @@ export default class RunPlayerState implements PlayerState {
             return this.nextState(new IdlePlayerState(this.player));
         }
 
-        if (commandes.meleeAttack && this.player.meleeAttackAvailable) {
+        if (this.player.weapon && commandes.meleeAttack && this.player.meleeAttackAvailable) {
             return this.nextState(new MeleeAttackPlayerState(this.player));
         }
     }

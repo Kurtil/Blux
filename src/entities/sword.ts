@@ -5,7 +5,7 @@ export default class Sword extends Phaser.Physics.Arcade.Sprite {
     hitPower = 1;
 
     constructor(scene: Phaser.Scene, x, y, key) {
-        super(scene, x, y, key, spriteSheetConfig.content.sword.from);
+        super(scene, x, y, key, spriteSheetConfig.content.sword.frame);
         this.scene.add.existing(this);
         this.setOrigin(0, 1);
     }

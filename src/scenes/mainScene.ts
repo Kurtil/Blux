@@ -7,7 +7,8 @@ import FireBall from "../entities/fireBall";
 import PlayerShot from "../entities/player/playerShot";
 import Enemy from "../entities/enemies/enemy";
 import MainScenePause from "./mainScenePause";
-import PickUp from "../entities/pickup.js";
+import PickUp from "../entities/pickup";
+import SwordPickUp from "../entities/swordPickUp";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -67,6 +68,8 @@ export default class MainScene extends Phaser.Scene {
         // Pickup management
         this.pickupGroup = this.add.group();
         this.pickupGroup.addMultiple((new GemFactory(this, spriteSheetConfig.name)).generateGemsFromMap(this.map));
+        const sword: any = this.map.findObject("weapons", obj => obj.name === "sword");
+        this.pickupGroup.add(new SwordPickUp(this, sword.x + 8, sword.y - 8, spriteSheetConfig.name));
 
         // Physic management
         this.physics.add.collider(this.player, this.ground);

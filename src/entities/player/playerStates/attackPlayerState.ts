@@ -21,7 +21,7 @@ export default class AttackPLayerState implements PlayerState {
             return this.nextState(new IdlePlayerState(this.player));
         }
 
-        if (commandes.meleeAttack) {
+        if (this.player.weapon && commandes.meleeAttack && this.player.meleeAttackAvailable) {
             return this.nextState(new MeleeAttackPlayerState(this.player));
         }
     }
