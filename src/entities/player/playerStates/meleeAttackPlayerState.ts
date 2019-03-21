@@ -7,6 +7,25 @@ export default class MeleeAttackPlayerState implements PlayerState {
 
     player: Player = null;
     weaponY: number = null;
+    _weaponAngle: number = null;
+    _weaponX: number = null;
+
+    get weaponX() {
+        // 10 is the distance between hands when player is turned to the left and turned to the right
+        return this.player.flipX ? this._weaponX - 10 : this._weaponX;
+    }
+
+    set weaponX(value) {
+        this._weaponX = value;
+    }
+
+    get weaponAngle() {
+        return this.player.flipX ? - this._weaponAngle : this._weaponAngle;
+    }
+
+    set weaponAngle(value) {
+        this._weaponAngle = value;
+    }
 
     constructor(player: Player) {
         this.player = player;
@@ -14,25 +33,38 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.player.anims.play("meleeAttack");
         this.player.meleeAttack();
 
-        this.weaponY = this.player.y;
+        this.weaponX = this.player.x + 5;
+        this.weaponY = this.player.y - 2;
+        this.weaponAngle = 0;
 
         this.player.on("animationupdate-meleeAttack", (animation, frame) => {
-            debugger;
             switch (frame.index) {
-                case 2: this.weaponY = this.player.y;
+                // case 1 never happens in update
+                case 2:
+                    this.weaponX = this.player.x + 5;
+                    this.weaponY = this.player.y - 1;
+                    this.weaponAngle = 30;
                     break;
-                case 3: this.weaponY = this.player.y + 2;
+                case 3:
+                    this.weaponX = this.player.x + 5;
+                    this.weaponY = this.player.y;
+                    this.weaponAngle = 60;
                     break;
-                default: this.weaponY = this.player.y + 4;
+                default:
+                    this.weaponX = this.player.x + 5;
+                    this.weaponY = this.player.y + 1;
+                    this.weaponAngle = 65;
             }
         });
+
         this.player.once("animationcomplete-meleeAttack", () => {
             this.nextState(new AirPlayerState(this.player));
         });
 
-        this.player.updadeWeapon(this.player.x, this.weaponY);
-        this.player.weapon.setVisible(true);
-        this.player.weapon.play("sword");
+        this.player.meleeAttacking = true;
+
+        // this.player.weapon.play("sword");
+        this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);
     }
 
     update(commandes, time) {
@@ -54,11 +86,12 @@ export default class MeleeAttackPlayerState implements PlayerState {
             this.player.jump(time);
         }
 
-        this.player.updadeWeapon(this.player.x, this.weaponY);
+        this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);
     }
 
     nextState(nextState) {
-        this.player.weapon.setVisible(false);
+        this.player.meleeAttacking = false;
+        this.player.removeListener("animationupdate-meleeAttack");
         this.player.setCurrentState(nextState);
     }
 }

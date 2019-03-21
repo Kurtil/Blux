@@ -35,6 +35,7 @@ export default class Player extends Entity {
     score = 0;
 
     weapon: Sword = null;
+    meleeAttacking = false;
 
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
@@ -50,7 +51,6 @@ export default class Player extends Entity {
         this.currentState = new IdlePlayerState(this);
 
         this.weapon = new Sword(this.scene, this.x, this.y, spriteSheetConfig.name);
-        this.weapon.setVisible(false);
     }
 
     update(time: number) {
@@ -59,6 +59,9 @@ export default class Player extends Entity {
         } else {
             if (this.health <= 0) {
                 this.onDying();
+            }
+            if (!this.meleeAttacking) {
+                this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, this.flipX ? -135 : 135);
             }
             this.currentState.update(this.handleUserInput(this.cursors), time);
         }
@@ -122,8 +125,9 @@ export default class Player extends Entity {
 
     meleeAttack() {
         this.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 200 - 100 });
-        this.scene.physics.moveTo(this, this.flipX ? this.x - this.width * 2 : this.x + this.width * 2,
-            this.y, 200, 100);
+        // TODO implement a better dash (ex : in the air, no FLYING)
+        // this.scene.physics.moveTo(this, this.flipX ? this.x - this.width * 2 : this.x + this.width * 2,
+        //     this.y, 200, 100);
     }
 
     onDead(): any {
@@ -147,11 +151,12 @@ export default class Player extends Entity {
         });
     }
 
-    updadeWeapon(x, y) {
+    updadeWeapon(x, y, angle) {
         if (this.weapon) {
-            this.weapon.x = x + (this.flipX ? - 12 : + 12);
-            this.weapon.y = y;
-            this.weapon.flipX = this.flipX;
+            this.weapon.setX(x);
+            this.weapon.setY(y);
+            this.weapon.setAngle(angle);
+            this.weapon.setFlipX(this.flipX);
         }
     }
     /**

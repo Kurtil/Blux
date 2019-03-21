@@ -1,24 +1,29 @@
-import Entity from "./entity";
+
 import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
 
-export default class Sword extends Entity {
+export default class Sword extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene: Phaser.Scene, x, y, key) {
-        super(scene, x + 1, y + 1, key, "Sword", Phaser.Physics.Arcade.DYNAMIC_BODY,
-            spriteSheetConfig.content.sword.from);
+        super(scene, x, y, key, spriteSheetConfig.content.sword.from);
+        this.scene.add.existing(this);
+        this.setOrigin(0, 1);
+    }
 
-        (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    set flipX(value) {
+        this.setDirectionOrigin(value);
+        super.flipX = value;
+    }
 
-        scene.anims.create({
-            key: "sword",
-            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name,
-                {
-                    start: spriteSheetConfig.content.sword.from,
-                    end: spriteSheetConfig.content.sword.to
-                }),
-            frameRate: 30,
-        });
+    setFlipX(value) {
+        this.setDirectionOrigin(value);
+        return super.setFlipX(value);
+    }
 
-        this.play("sword");
+    setDirectionOrigin(leftDirection) {
+        if (leftDirection) {
+            this.setOrigin(1, 1);
+        } else {
+            this.setOrigin(0, 1);
+        }
     }
 }
