@@ -168,6 +168,13 @@ export default class Player extends Entity {
         }
     }
 
+    addMeleeHitBox(x, y, width, height) {
+        const hitbox = this.scene.add.rectangle(x, y, width, height);
+        this.scene.physics.world.enableBody(hitbox);
+        (hitbox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+        return hitbox;
+    }
+
     /**
      * Update health of the player if possible
      * @param amount the amount to change

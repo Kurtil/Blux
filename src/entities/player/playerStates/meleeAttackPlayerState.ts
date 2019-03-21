@@ -8,6 +8,7 @@ export default class MeleeAttackPlayerState implements PlayerState {
     weaponY: number = null;
     weaponAngle: number = null;
     _weaponX: number = null;
+    hitbox: Phaser.GameObjects.Rectangle = null;
 
     get weaponX() {
         // 10 is the distance between hands when player is turned to the left and turned to the right
@@ -30,7 +31,7 @@ export default class MeleeAttackPlayerState implements PlayerState {
 
         this.player.on("animationupdate-meleeAttack", (animation, frame) => {
             switch (frame.index) {
-                // case 1 never happens in update
+                // case 1 never happens in update if not looping animation
                 case 2:
                     this.weaponX = this.player.x + 5;
                     this.weaponY = this.player.y - 1;
@@ -54,8 +55,14 @@ export default class MeleeAttackPlayerState implements PlayerState {
 
         this.player.meleeAttacking = true;
 
+        this.hitbox = this.player.addMeleeHitBox(this.player.flipX ? this.weaponX - 10 : this.weaponX + 10,
+            this.weaponY - 10, 16, 5);
+        this.player.shotGroup.add(this.hitbox);
+        (this.hitbox as any).hit = () => { }; // TODO do better : this is for working in shot group
+
         // this.player.weapon.play("sword");
         this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);
+
     }
 
     update(commandes, time) {
@@ -80,11 +87,19 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);
         this.player.lastMeleeAttack = time;
         this.player.meleeAttackAvailable = false;
+
+        this.updateHitBox(this.player.flipX ? this.weaponX - 10 : this.weaponX + 10, this.weaponY);
     }
 
     nextState(nextState) {
+        this.hitbox.destroy();
         this.player.meleeAttacking = false;
         this.player.removeListener("animationupdate-meleeAttack");
         this.player.setCurrentState(nextState);
+    }
+
+    updateHitBox(x, y) {
+        this.hitbox.x = x;
+        this.hitbox.y = y;
     }
 }
