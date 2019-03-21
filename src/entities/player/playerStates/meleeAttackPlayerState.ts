@@ -78,6 +78,8 @@ export default class MeleeAttackPlayerState implements PlayerState {
         }
 
         this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);
+        this.player.lastMeleeAttack = time;
+        this.player.meleeAttackAvailable = false;
     }
 
     nextState(nextState) {

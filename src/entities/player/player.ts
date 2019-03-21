@@ -36,6 +36,9 @@ export default class Player extends Entity {
 
     weapon: Sword = null;
     meleeAttacking = false;
+    meleeAttackAvailable = true;
+    meleeAttackSpeed = 300;
+    lastMeleeAttack: number = null;
 
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
@@ -59,11 +62,16 @@ export default class Player extends Entity {
         } else {
             if (this.health <= 0) {
                 this.onDying();
+            } else {
+                // Alive state lies here
+                if (time - this.lastMeleeAttack > this.meleeAttackSpeed) {
+                    this.meleeAttackAvailable = true;
+                }
+                if (!this.meleeAttacking) {
+                    this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, 135);
+                }
+                this.currentState.update(this.handleUserInput(this.cursors), time);
             }
-            if (!this.meleeAttacking) {
-                this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, 135);
-            }
-            this.currentState.update(this.handleUserInput(this.cursors), time);
         }
     }
 

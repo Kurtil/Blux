@@ -38,7 +38,7 @@ export default class AirPlayerState implements PlayerState {
             this.player.setVelocityX(0);
         }
 
-        if (commandes.meleeAttack) {
+        if (commandes.meleeAttack && this.player.meleeAttackAvailable) {
             return this.nextState(new MeleeAttackPlayerState(this.player));
         }
     }
