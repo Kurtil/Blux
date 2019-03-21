@@ -24,7 +24,20 @@ export default class SpiderDog extends Entity {
     attackAvailable = true;
     attackHitBoxGroup: Phaser.GameObjects.Group = null;
     healthBar: HealthBar = null;
-    health = 3;
+    _health = 3;
+
+    get health() {
+        return this._health;
+    }
+
+    set health(value) {
+        if (value < 0) {
+            this._health = 0;
+        } else {
+            this._health = value;
+        }
+    }
+
     maxHealth = 3;
     isDead = false;
     walkSound: Phaser.Sound.BaseSound = null;
@@ -106,8 +119,8 @@ export default class SpiderDog extends Entity {
         return this.canSee(this.distanceToAttack, target);
     }
 
-    hit() {
-        this.onHit();
+    hit(power) {
+        this.onHit(power);
     }
 
     disableAttackHitBox() {
@@ -151,8 +164,8 @@ export default class SpiderDog extends Entity {
         this.scene.sound.play("spiderDogWalk", { loop: true });
     }
 
-    private onHit() {
-        this.health--;
+    private onHit(power) {
+        this.health -= power;
         this.healthBar.updateHealthBar(this.health);
         if (this.health === 0) {
             this.onDead();

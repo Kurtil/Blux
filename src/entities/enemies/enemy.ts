@@ -19,9 +19,21 @@ export default class Enemy extends Entity {
     debug = false;
     attackDistanceLimit = 100;
     maxHealth = 4;
-    health = 4;
+    _health = 4;
     healthBar: HealthBar = null;
     isDead = false;
+
+    get health() {
+        return this._health;
+    }
+
+    set health(value) {
+        if (value < 0) {
+            this._health = 0;
+        } else {
+            this._health = value;
+        }
+    }
 
     constructor(scene: MainScene, x, y, key, shotGroup) {
         super(scene, x, y, key, "Enemy", Phaser.Physics.Arcade.STATIC_BODY);
@@ -66,12 +78,12 @@ export default class Enemy extends Entity {
         }
     }
 
-    hit() {
-        this.onHit();
+    hit(power) {
+        this.onHit(power);
     }
 
-    private onHit() {
-        this.health--;
+    private onHit(power) {
+        this.health -= power;
         this.healthBar.updateHealthBar(this.health);
         if (this.health === 0) {
             this.onDead();

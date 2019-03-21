@@ -6,17 +6,19 @@ import IdlePlayerState from "./playerStates/idlePlayerState";
 import PlayerCommands from "./playerCommands";
 import DiePLayerState from "./playerStates/diePlayerState";
 import PlayerShot from "./playerShot";
+import Sword from "../sword";
 
 export default class Player extends Entity {
 
     cursors: Phaser.Input.Keyboard.CursorKeys = null;
-
+    xKey: Phaser.Input.Keyboard.Key = null;
     currentState: State = null;
 
     shotGroup: Phaser.GameObjects.Group = null;
     shotPower = 1;
 
     speed = 140;
+    airSpeed = 120;
 
     jumpPower = 200;
     jumpDelay = 200;
@@ -32,12 +34,20 @@ export default class Player extends Entity {
 
     score = 0;
 
+    weapon: Sword = null;
+    meleeAttacking = false;
+    meleeAttackAvailable = true;
+    meleeAttackSpeed = 300;
+    lastMeleeAttack: number = null;
+
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
 
         this.setSize(10, 15).setOffset(3, 1).setDragX(100);
 
         this.cursors = this.scene.input.keyboard.createCursorKeys();
+
+        this.setDepth(1);
 
         this.createAnimations();
         this.shotGroup = this.scene.add.group();
@@ -50,8 +60,16 @@ export default class Player extends Entity {
         } else {
             if (this.health <= 0) {
                 this.onDying();
+            } else {
+                // Alive state lies here
+                if (time - this.lastMeleeAttack > this.meleeAttackSpeed) {
+                    this.meleeAttackAvailable = true;
+                }
+                if (!this.meleeAttacking) {
+                    this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, 135);
+                }
+                this.currentState.update(this.handleUserInput(this.cursors), time);
             }
-            this.currentState.update(this.handleUserInput(this.cursors), time);
         }
     }
 
@@ -90,7 +108,7 @@ export default class Player extends Entity {
     * @returns true if the effect affected the player, false if no effect
     */
     affect(effect): boolean {
-        const { health, maxHealth, score } = effect;
+        const { health, maxHealth, score, weapon } = effect;
         let affected = false;
         if (health) {
             affected = this.updateHealth(health);
@@ -103,12 +121,24 @@ export default class Player extends Entity {
             this.updateMaxHealth(maxHealth);
             affected = true;
         }
+        if (weapon) {
+            this.equip(new weapon(this.scene, this.x, this.y, spriteSheetConfig.name));
+            affected = true;
+        }
         return affected;
     }
 
     attack(): any {
-        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y, spriteSheetConfig.name, this));
+        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y,
+            spriteSheetConfig.name, this, this.shotPower));
         this.scene.sound.play("playerAttack", { detune: Math.random() * 50 - 25 });
+    }
+
+    meleeAttack() {
+        this.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 200 - 100 });
+        // TODO implement a better dash (ex : in the air, no FLYING)
+        // this.scene.physics.moveTo(this, this.flipX ? this.x - this.width * 2 : this.x + this.width * 2,
+        //     this.y, 200, 100);
     }
 
     onDead(): any {
@@ -130,6 +160,26 @@ export default class Player extends Entity {
             onCompleteScope: this,
             repeat: repeatTime
         });
+    }
+
+    updadeWeapon(x, y, angle) {
+        if (this.weapon) {
+            this.weapon.setX(x);
+            this.weapon.setY(y);
+            this.weapon.setFlipX(this.flipX);
+            this.weapon.setAngle(angle);
+        }
+    }
+
+    addMeleeHitBox(x, y, width, height) {
+        const hitbox = this.scene.add.rectangle(x, y, width, height);
+        this.scene.physics.world.enableBody(hitbox);
+        (hitbox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+        return hitbox;
+    }
+
+    meleeAttackSound(): any {
+        this.scene.sound.play("meleeHit", { volume: 0.2, detune: Phaser.Math.Between(-500, 500) });
     }
 
     /**
@@ -168,6 +218,13 @@ export default class Player extends Entity {
         }
     }
 
+    private equip(weapon): any {
+        if (this.weapon) {
+            this.weapon.destroy();
+        }
+        this.weapon = weapon;
+    }
+
     private isOutOfBounds(): any {
         return this.x > (<MainScene>this.scene).map.width * (<MainScene>this.scene).map.tileWidth ||
             this.x < 0 ||
@@ -181,12 +238,13 @@ export default class Player extends Entity {
         }
     }
 
-    private handleUserInput(cursors): PlayerCommands {
+    private handleUserInput(cursors: Phaser.Input.Keyboard.CursorKeys): PlayerCommands {
         return {
             up: cursors.up.isDown,
             right: cursors.right.isDown,
             left: cursors.left.isDown,
-            attack: cursors.space.isDown
+            meleeAttack: cursors.space.isDown,
+            attack: cursors.down.isDown,
         };
     }
 
@@ -236,6 +294,15 @@ export default class Player extends Entity {
             key: "playerShotExplodes",
             frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name, { start: 150, end: 163 }),
             frameRate: 50,
+        });
+        this.scene.anims.create({
+            key: "meleeAttack",
+            frames: this.scene.anims.generateFrameNumbers(spriteSheetConfig.name,
+                {
+                    start: spriteSheetConfig.content.player.meleeAttack.from,
+                    end: spriteSheetConfig.content.player.meleeAttack.to
+                }),
+            frameRate: 24,
         });
     }
 }

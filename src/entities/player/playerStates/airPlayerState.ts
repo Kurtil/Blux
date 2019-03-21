@@ -3,6 +3,7 @@ import PlayerCommands from "../playerCommands";
 import Player from "../player";
 import RunPlayerState from "./runPlayerState";
 import IdlePlayerState from "./idlePlayerState";
+import MeleeAttackPlayerState from "./meleeAttackPlayerState";
 
 export default class AirPlayerState implements PlayerState {
     player: Player = null;
@@ -20,21 +21,29 @@ export default class AirPlayerState implements PlayerState {
         // is player in good state
         if (this.player.body.blocked.down || this.player.body.touching.down) {
             if (this.player.body.velocity.x === 0) {
-                return this.player.setCurrentState(new IdlePlayerState(this.player));
+                return this.nextState(new IdlePlayerState(this.player));
             } else {
-                return this.player.setCurrentState(new RunPlayerState(this.player));
+                return this.nextState(new RunPlayerState(this.player));
             }
         }
         // player commands may change the state
         if (commandes.left) {
-            this.player.setVelocityX(-140);
+            this.player.setVelocityX(-this.player.airSpeed);
             this.player.setFlipX(true);
         } else if (commandes.right) {
-            this.player.setVelocityX(140);
+            this.player.setVelocityX(this.player.airSpeed);
             this.player.setFlipX(false);
         }
         if (!commandes.left && !commandes.right) {
             this.player.setVelocityX(0);
         }
+
+        if (this.player.weapon && commandes.meleeAttack && this.player.meleeAttackAvailable) {
+            return this.nextState(new MeleeAttackPlayerState(this.player));
+        }
+    }
+
+    nextState(nextState) {
+        this.player.setCurrentState(nextState);
     }
 }

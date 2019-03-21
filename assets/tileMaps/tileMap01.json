@@ -196,6 +196,53 @@
         }, 
         {
          "draworder":"topdown",
+         "id":13,
+         "name":"weapons",
+         "objects":[
+                {
+                 "gid":38,
+                 "height":16,
+                 "id":53,
+                 "name":"sword",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":512,
+                 "y":192
+                }, 
+                {
+                 "gid":39,
+                 "height":16,
+                 "id":54,
+                 "name":"forrestSword",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":480,
+                 "y":384
+                }, 
+                {
+                 "gid":40,
+                 "height":16,
+                 "id":55,
+                 "name":"hellSword",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":976,
+                 "y":96
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":4,
          "name":"gems",
          "objects":[
@@ -439,8 +486,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":13,
- "nextobjectid":53,
+ "nextlayerid":14,
+ "nextobjectid":56,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.2.1",
@@ -450,12 +497,12 @@
          "columns":10,
          "firstgid":1,
          "image":"..\/spriteSheets\/BluxSpriteSheet.png",
-         "imageheight":304,
+         "imageheight":320,
          "imagewidth":160,
          "margin":0,
          "name":"BluxSpriteSheet",
          "spacing":0,
-         "tilecount":190,
+         "tilecount":200,
          "tileheight":16,
          "tiles":[
                 {

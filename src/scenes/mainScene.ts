@@ -7,7 +7,11 @@ import FireBall from "../entities/fireBall";
 import PlayerShot from "../entities/player/playerShot";
 import Enemy from "../entities/enemies/enemy";
 import MainScenePause from "./mainScenePause";
-import PickUp from "../entities/pickup.js";
+import PickUp from "../entities/pickup";
+import SwordPickUp from "../entities/swordPickUp";
+import Sword from "../entities/sword";
+import ForrestSword from "../entities/forrestSword";
+import HellSword from "../entities/hellSword";
 
 export default class MainScene extends Phaser.Scene {
 
@@ -67,6 +71,16 @@ export default class MainScene extends Phaser.Scene {
         // Pickup management
         this.pickupGroup = this.add.group();
         this.pickupGroup.addMultiple((new GemFactory(this, spriteSheetConfig.name)).generateGemsFromMap(this.map));
+        const sword: any = this.map.findObject("weapons", obj => obj.name === "sword");
+        const forrestSword: any = this.map.findObject("weapons", obj => obj.name === "forrestSword");
+        const hellSword: any = this.map.findObject("weapons", obj => obj.name === "hellSword");
+        this.pickupGroup.addMultiple([
+            new SwordPickUp(this, sword.x + 8, sword.y - 8, spriteSheetConfig.name,
+                spriteSheetConfig.content.sword.frame, Sword),
+            new SwordPickUp(this, forrestSword.x + 8, forrestSword.y - 8, spriteSheetConfig.name,
+                spriteSheetConfig.content.forrestSword.frame, ForrestSword),
+            new SwordPickUp(this, hellSword.x + 8, hellSword.y - 8, spriteSheetConfig.name,
+                spriteSheetConfig.content.hellSword.frame, HellSword)]);
 
         // Physic management
         this.physics.add.collider(this.player, this.ground);
@@ -99,8 +113,7 @@ export default class MainScene extends Phaser.Scene {
                 playerShot.hit();
             });
         this.physics.add.collider(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
-            shot.hit();
-            enemy.hit();
+            enemy.hit(shot.hit());
         });
 
         // Camera management
