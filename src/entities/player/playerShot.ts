@@ -6,11 +6,13 @@ export default class PlayerShot extends Entity {
 
     speed = 200;
     player: Player = null;
+    power: number = null;
 
-    constructor(scene: MainScene, x, y, key, player: Player) {
+    constructor(scene: MainScene, x, y, key, player: Player, power) {
         super(scene, x, y, key, "PlayerShot");
 
         this.player = player;
+        this.power = power;
 
         (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 
@@ -31,6 +33,8 @@ export default class PlayerShot extends Entity {
             this.y);
         this.scene.sound.play("playerShotExplodes", { volume: 0.5 / Math.max((distanceToPlayer / 50), 1) });
         this.once("animationcomplete-playerShotExplodes", () => this.destroy());
+
+        return this.power;
     }
 
 }

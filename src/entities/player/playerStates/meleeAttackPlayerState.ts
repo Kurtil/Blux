@@ -9,6 +9,7 @@ export default class MeleeAttackPlayerState implements PlayerState {
     weaponAngle: number = null;
     _weaponX: number = null;
     hitbox: Phaser.GameObjects.Rectangle = null;
+    hitPower: number = null;
 
     get weaponX() {
         // 10 is the distance between hands when player is turned to the left and turned to the right
@@ -21,6 +22,7 @@ export default class MeleeAttackPlayerState implements PlayerState {
 
     constructor(player: Player) {
         this.player = player;
+        this.hitPower = this.player.weapon.hitPower;
 
         this.player.anims.play("meleeAttack");
         this.player.meleeAttack();
@@ -58,7 +60,14 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.hitbox = this.player.addMeleeHitBox(this.player.flipX ? this.weaponX - 10 : this.weaponX + 10,
             this.weaponY - 10, 16, 5);
         this.player.shotGroup.add(this.hitbox);
-        (this.hitbox as any).hit = () => { }; // TODO do better : this is for working in shot group
+        (this.hitbox as any).hit = () => {
+            if (this.hitPower > 0) {
+                this.player.meleeAttackSound();
+                return this.hitPower--;
+            } else {
+                return 0;
+            }
+        };
 
         // this.player.weapon.play("sword");
         this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);

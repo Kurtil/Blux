@@ -99,8 +99,7 @@ export default class MainScene extends Phaser.Scene {
                 playerShot.hit();
             });
         this.physics.add.collider(shotGroup, this.enemies, (shot: PlayerShot, enemy: Enemy) => {
-            shot.hit();
-            enemy.hit();
+            enemy.hit(shot.hit());
         });
 
         // Camera management

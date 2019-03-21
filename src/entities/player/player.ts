@@ -127,7 +127,8 @@ export default class Player extends Entity {
     }
 
     attack(): any {
-        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y, spriteSheetConfig.name, this));
+        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y,
+            spriteSheetConfig.name, this, this.shotPower));
         this.scene.sound.play("playerAttack", { detune: Math.random() * 50 - 25 });
     }
 
@@ -173,6 +174,10 @@ export default class Player extends Entity {
         this.scene.physics.world.enableBody(hitbox);
         (hitbox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
         return hitbox;
+    }
+
+    meleeAttackSound(): any {
+        this.scene.sound.play("meleeHit", { volume: 0.2, detune: Phaser.Math.Between(-500, 500) });
     }
 
     /**
