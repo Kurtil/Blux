@@ -1,4 +1,3 @@
-
 import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
 
 export default class Sword extends Phaser.Physics.Arcade.Sprite {
@@ -7,11 +6,6 @@ export default class Sword extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, key, spriteSheetConfig.content.sword.from);
         this.scene.add.existing(this);
         this.setOrigin(0, 1);
-    }
-
-    set flipX(value) {
-        this.setDirectionOrigin(value);
-        super.flipX = value;
     }
 
     setFlipX(value) {
@@ -25,5 +19,9 @@ export default class Sword extends Phaser.Physics.Arcade.Sprite {
         } else {
             this.setOrigin(0, 1);
         }
+    }
+
+    setAngle(value) {
+        return super.setAngle(this.flipX ? - value : value);
     }
 }

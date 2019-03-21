@@ -61,7 +61,7 @@ export default class Player extends Entity {
                 this.onDying();
             }
             if (!this.meleeAttacking) {
-                this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, this.flipX ? -135 : 135);
+                this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, 135);
             }
             this.currentState.update(this.handleUserInput(this.cursors), time);
         }
@@ -155,10 +155,11 @@ export default class Player extends Entity {
         if (this.weapon) {
             this.weapon.setX(x);
             this.weapon.setY(y);
-            this.weapon.setAngle(angle);
             this.weapon.setFlipX(this.flipX);
+            this.weapon.setAngle(angle);
         }
     }
+
     /**
      * Update health of the player if possible
      * @param amount the amount to change

@@ -1,13 +1,12 @@
 import PlayerState from "./playerState";
 import Player from "../player";
 import AirPlayerState from "./airPlayerState";
-import Sword from "../../sword";
 
 export default class MeleeAttackPlayerState implements PlayerState {
 
     player: Player = null;
     weaponY: number = null;
-    _weaponAngle: number = null;
+    weaponAngle: number = null;
     _weaponX: number = null;
 
     get weaponX() {
@@ -17,14 +16,6 @@ export default class MeleeAttackPlayerState implements PlayerState {
 
     set weaponX(value) {
         this._weaponX = value;
-    }
-
-    get weaponAngle() {
-        return this.player.flipX ? - this._weaponAngle : this._weaponAngle;
-    }
-
-    set weaponAngle(value) {
-        this._weaponAngle = value;
     }
 
     constructor(player: Player) {
