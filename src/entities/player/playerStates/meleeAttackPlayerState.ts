@@ -5,48 +5,48 @@ import AirPlayerState from "./airPlayerState";
 export default class MeleeAttackPlayerState implements PlayerState {
 
     player: Player = null;
-    weaponY: number = null;
+    weaponDeltaY: number = null;
     weaponAngle: number = null;
-    _weaponX: number = null;
+    _weaponDeltaX: number = null;
     hitbox: Phaser.GameObjects.Rectangle = null;
     hitPower: number = null;
 
-    get weaponX() {
+    get weaponDeltaX() {
         // 10 is the distance between hands when player is turned to the left and turned to the right
-        return this.player.flipX ? this._weaponX - 10 : this._weaponX;
+        return this.player.flipX ? this._weaponDeltaX - 10 : this._weaponDeltaX;
     }
 
-    set weaponX(value) {
-        this._weaponX = value;
+    set weaponDeltaX(value) {
+        this._weaponDeltaX = value;
     }
 
     constructor(player: Player) {
+
         this.player = player;
         this.hitPower = this.player.weapon.hitPower;
 
-        this.player.anims.play("meleeAttack");
         this.player.meleeAttack();
 
-        this.weaponX = this.player.x + 5;
-        this.weaponY = this.player.y - 2;
+        this.weaponDeltaX = 5;
+        this.weaponDeltaY = - 2;
         this.weaponAngle = 0;
 
         this.player.on("animationupdate-meleeAttack", (animation, frame) => {
             switch (frame.index) {
                 // case 1 never happens in update if not looping animation
                 case 2:
-                    this.weaponX = this.player.x + 5;
-                    this.weaponY = this.player.y - 1;
+                    this.weaponDeltaX = 5;
+                    this.weaponDeltaY = 1;
                     this.weaponAngle = 30;
                     break;
                 case 3:
-                    this.weaponX = this.player.x + 5;
-                    this.weaponY = this.player.y;
+                    this.weaponDeltaX = 5;
+                    this.weaponDeltaY = 0;
                     this.weaponAngle = 60;
                     break;
                 default:
-                    this.weaponX = this.player.x + 5;
-                    this.weaponY = this.player.y + 1;
+                    this.weaponDeltaX = 5;
+                    this.weaponDeltaY = 1;
                     this.weaponAngle = 65;
             }
         });
@@ -55,26 +55,9 @@ export default class MeleeAttackPlayerState implements PlayerState {
             this.nextState(new AirPlayerState(this.player));
         });
 
-        this.player.meleeAttacking = true;
+        this.hitbox = this.addMeleeHitBox();
 
-        this.hitbox = this.player.addMeleeHitBox(this.player.flipX ? this.weaponX - 10 : this.weaponX + 10,
-            this.weaponY - 10, 16, 5);
-        this.player.shotGroup.add(this.hitbox);
-        (this.hitbox as any).hit = () => {
-            if (this.hitPower > 0) {
-                // TODO may be implemented a better way
-                this.player.meleeAttackSound();
-                const power = this.hitPower;
-                this.hitPower = 0;
-                return power;
-            } else {
-                return 0;
-            }
-        };
-
-        // this.player.weapon.play("sword");
-        this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);
-
+        this.updateWeaponDisplay();
     }
 
     update(commandes, time) {
@@ -96,11 +79,10 @@ export default class MeleeAttackPlayerState implements PlayerState {
             this.player.jump(time);
         }
 
-        this.player.updadeWeapon(this.weaponX, this.weaponY, this.weaponAngle);
+        this.updateWeapon();
+
         this.player.lastMeleeAttack = time;
         this.player.meleeAttackAvailable = false;
-
-        this.updateHitBox(this.player.flipX ? this.weaponX - 10 : this.weaponX + 10, this.weaponY);
     }
 
     nextState(nextState) {
@@ -110,8 +92,33 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.player.setCurrentState(nextState);
     }
 
-    updateHitBox(x, y) {
-        this.hitbox.x = x;
-        this.hitbox.y = y;
+    private updateHitBox() {
+        this.hitbox.x = this.player.flipX ?
+            this.player.x + this.weaponDeltaX - 10 :
+            this.player.x + this.weaponDeltaX + 10;
+        this.hitbox.y = this.player.y + this.weaponDeltaY;
+    }
+
+    private updateWeaponDisplay() {
+        this.player.updadeWeapon(
+            this.player.x + this.weaponDeltaX,
+            this.player.y + this.weaponDeltaY,
+            this.weaponAngle);
+    }
+
+    private updateWeapon(): void {
+        this.updateWeaponDisplay();
+        this.updateHitBox();
+    }
+
+    private addMeleeHitBox(): Phaser.GameObjects.Rectangle {
+        return this.player.addMeleeHitBox(
+            this.player.flipX ?
+                this.player.x + this.weaponDeltaX - 10 :
+                this.player.x + this.weaponDeltaX + 10,
+            this.player.y + this.weaponDeltaY - 10,
+            16,
+            5,
+            this.hitPower);
     }
 }

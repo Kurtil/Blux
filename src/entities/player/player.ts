@@ -135,6 +135,8 @@ export default class Player extends Entity {
     }
 
     meleeAttack() {
+        this.meleeAttacking = true;
+        this.anims.play("meleeAttack");
         this.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 200 - 100 });
         // TODO implement a better dash (ex : in the air, no FLYING)
         // this.scene.physics.moveTo(this, this.flipX ? this.x - this.width * 2 : this.x + this.width * 2,
@@ -171,10 +173,23 @@ export default class Player extends Entity {
         }
     }
 
-    addMeleeHitBox(x, y, width, height) {
+    addMeleeHitBox(x, y, width, height, hitPower = 1) {
         const hitbox = this.scene.add.rectangle(x, y, width, height);
         this.scene.physics.world.enableBody(hitbox);
         (hitbox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+
+        this.shotGroup.add(hitbox);
+        (hitbox as any).hit = () => {
+            if (hitPower > 0) {
+                // a hit can hit only once will all its power
+                this.meleeAttackSound();
+                const power = hitPower;
+                hitPower = 0;
+                return power;
+            } else {
+                return 0;
+            }
+        };
         return hitbox;
     }
 
