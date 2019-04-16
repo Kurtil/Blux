@@ -12,13 +12,12 @@ export default class AirPlayerState implements PlayerState {
         this.player = player;
     }
 
-    update(commandes: PlayerCommands, time): void {
+    update(time): void {
         if (this.player.body.velocity.y > 0) {
             this.player.anims.play("land");
         } else {
             this.player.anims.play("jump");
         }
-        // is player in good state
         if (this.player.body.blocked.down || this.player.body.touching.down) {
             if (this.player.body.velocity.x === 0) {
                 return this.nextState(new IdlePlayerState(this.player));
@@ -26,7 +25,9 @@ export default class AirPlayerState implements PlayerState {
                 return this.nextState(new RunPlayerState(this.player));
             }
         }
-        // player commands may change the state
+    }
+
+    handleUserInputs(commandes: PlayerCommands) {
         if (commandes.left) {
             this.player.setVelocityX(-this.player.airSpeed);
             this.player.setFlipX(true);

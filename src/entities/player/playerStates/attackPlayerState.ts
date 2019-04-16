@@ -15,7 +15,11 @@ export default class AttackPLayerState implements PlayerState {
         });
     }
 
-    update(commandes: PlayerCommands, time): void {
+    update(time): void {
+
+    }
+
+    handleUserInputs(commandes: PlayerCommands) {
         if (!commandes.attack) {
             this.player.removeListener("animationupdate-attack");
             return this.nextState(new IdlePlayerState(this.player));

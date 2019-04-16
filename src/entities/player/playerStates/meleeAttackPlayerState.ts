@@ -60,8 +60,14 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.updateWeaponDisplay();
     }
 
-    update(commandes, time) {
-        // player commands may change the state
+    update(time) {
+        this.player.lastMeleeAttack = time;
+        this.player.meleeAttackAvailable = false;
+
+        this.updateWeapon();
+    }
+
+    handleUserInputs(commandes, time) {
         const onSomething = this.player.body.touching.down || this.player.body.blocked.down;
 
         if (commandes.left) {
@@ -78,11 +84,6 @@ export default class MeleeAttackPlayerState implements PlayerState {
         if ((onSomething) && commandes.up) {
             this.player.jump(time);
         }
-
-        this.updateWeapon();
-
-        this.player.lastMeleeAttack = time;
-        this.player.meleeAttackAvailable = false;
     }
 
     nextState(nextState) {

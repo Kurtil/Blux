@@ -13,12 +13,13 @@ export default class RunPlayerState implements PlayerState {
         this.player.anims.play("walk");
     }
 
-    update(commandes: PlayerCommands, time) {
-        // is player in good state
+    update(time) {
         if (!this.player.body.blocked.down && !this.player.body.touching.down) {
             return this.nextState(new AirPlayerState(this.player));
         }
-        // player commands may change the state
+    }
+
+    handleUserInputs(commandes: PlayerCommands, time) {
         if (commandes.up) {
             if (this.player.jump(time)) return this.nextState(new AirPlayerState(this.player));
         }

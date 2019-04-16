@@ -13,7 +13,9 @@ export default class DiePLayerState implements PlayerState {
         });
     }
 
-    update(commandes: PlayerCommands, time): void { }
+    update(time): void { }
+
+    handleUserInputs(commandes: PlayerCommands) { }
 
     nextState(nextState) { }
 }

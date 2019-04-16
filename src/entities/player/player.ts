@@ -68,7 +68,8 @@ export default class Player extends Entity {
                 if (!this.meleeAttacking) {
                     this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, 135);
                 }
-                this.currentState.update(this.handleUserInput(this.cursors), time);
+                this.currentState.update(time);
+                this.currentState.handleUserInputs(this.parseUserInput(this.cursors), time);
             }
         }
     }
@@ -253,7 +254,7 @@ export default class Player extends Entity {
         }
     }
 
-    private handleUserInput(cursors: Phaser.Input.Keyboard.CursorKeys): PlayerCommands {
+    private parseUserInput(cursors: Phaser.Input.Keyboard.CursorKeys): PlayerCommands {
         return {
             up: cursors.up.isDown,
             right: cursors.right.isDown,
