@@ -8,22 +8,25 @@ import PlayerShot from "../entities/player/playerShot";
 import Enemy from "../entities/enemies/enemy";
 import MainScenePause from "./mainScenePause";
 import PickUp from "../entities/pickup";
-import SwordPickUp from "../entities/swordPickUp";
-import Sword from "../entities/sword";
-import ForrestSword from "../entities/forrestSword";
-import HellSword from "../entities/hellSword";
+import SwordPickUp from "../entities/swords/swordPickUp";
+import Sword from "../entities/swords/sword";
+import ForrestSword from "../entities/swords/forrestSword";
+import HellSword from "../entities/swords/hellSword";
+import PlayerCommands from "../entities/player/playerCommands.js";
 
 export default class MainScene extends Phaser.Scene {
 
     DEBUG = false;
 
     player: Player = null;
+    cursors: Phaser.Input.Keyboard.CursorKeys = null;
     map: Phaser.Tilemaps.Tilemap = null;
     enemies: Phaser.GameObjects.Sprite[] = null;
     ground: Phaser.Tilemaps.StaticTilemapLayer = null;
     pickupGroup: Phaser.GameObjects.Group = null;
     hitScore = 10;
     nextScene: string;
+    sceneEnding: boolean;
 
     constructor() {
         super({
@@ -32,6 +35,8 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
+
+        this.sceneEnding = false;
 
         this.sys.sound.volume = 0.2;
         // this.cameras.main.roundPixels = true;
@@ -127,7 +132,8 @@ export default class MainScene extends Phaser.Scene {
 
         this.setDebugGraphics(this.DEBUG);
 
-        // pause key
+        // keys
+        this.cursors = this.input.keyboard.createCursorKeys();
         this.input.keyboard.on("keydown-P", () => {
             this.pause();
         });
@@ -135,19 +141,34 @@ export default class MainScene extends Phaser.Scene {
 
     update(time) {
         this.enemies.forEach(enemy => enemy.update(time));
-        this.player.update(time);
+        if (!this.sceneEnding) {
+            if (this.player.isDead) {
+                this.onPlayerDead();
+                this.sceneEnding = true;
+            } else {
+                this.player.update(time, this.parseUserInput(this.cursors));
 
-        if (this.player.score === this.hitScore) {
-            this.onWin();
-        }
-        if (this.player.isDead) {
-            this.onPlayerDead();
+                if (this.player.score === this.hitScore) {
+                    this.onWin();
+                    this.sceneEnding = true;
+                }
+            }
         }
     }
 
     updateHUD(): any {
         (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerScore(this.player.score);
         (this.scene.get("mainSceneHUD") as MainSceneHUD).updatePlayerLife(this.player.health, this.player.maxHealth);
+    }
+
+    private parseUserInput(cursors: Phaser.Input.Keyboard.CursorKeys): PlayerCommands {
+        return {
+            up: cursors.up.isDown,
+            right: cursors.right.isDown,
+            left: cursors.left.isDown,
+            meleeAttack: cursors.space.isDown,
+            rangedAttack: cursors.shift.isDown,
+        };
     }
 
     private onWin() {

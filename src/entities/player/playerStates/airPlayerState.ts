@@ -1,6 +1,6 @@
 import PlayerState from "./playerState";
-import PlayerCommands from "../playerCommands";
 import Player from "../player";
+import PlayerCommands from "../playerCommands";
 
 export default class AirPlayerState implements PlayerState {
     player: Player = null;
@@ -38,8 +38,8 @@ export default class AirPlayerState implements PlayerState {
             this.player.setVelocityX(0);
         }
 
-        if (this.player.weapon && commandes.meleeAttack && this.player.meleeAttackAvailable) {
-            return this.nextState(this.player.states.melee);
+        if (commandes.meleeAttack && this.player.meleeAttackAvailable) {
+            return this.nextState(this.player.states.meleeAttack);
         }
     }
 

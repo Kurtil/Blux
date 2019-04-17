@@ -2,6 +2,6 @@ export default interface PlayerCommands {
     up?: boolean;
     right?: boolean;
     left?: boolean;
-    attack?: boolean;
+    rangedAttack?: boolean;
     meleeAttack?: boolean;
 }

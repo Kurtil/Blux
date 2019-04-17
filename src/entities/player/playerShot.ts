@@ -4,15 +4,16 @@ import Player from "./player";
 
 export default class PlayerShot extends Entity {
 
-    speed = 200;
     player: Player = null;
     power: number = null;
+    speed: number = null;
 
-    constructor(scene: MainScene, x, y, key, player: Player, power) {
+    constructor(scene: MainScene, x, y, key, player: Player, power, speed) {
         super(scene, x, y, key, "PlayerShot");
 
         this.player = player;
         this.power = power;
+        this.speed = speed;
 
         (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
 

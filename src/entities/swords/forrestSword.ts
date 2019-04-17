@@ -1,11 +1,11 @@
-import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
+import spriteSheetConfig from "../../../assets/spriteSheets/spriteSheet.json";
 
-export default class Sword extends Phaser.Physics.Arcade.Sprite {
+export default class ForrestSword extends Phaser.Physics.Arcade.Sprite {
 
-    hitPower = 1;
+    hitPower = 2;
 
     constructor(scene: Phaser.Scene, x, y, key) {
-        super(scene, x, y, key, spriteSheetConfig.content.sword.frame);
+        super(scene, x, y, key, spriteSheetConfig.content.forrestSword.frame);
         this.scene.add.existing(this);
         this.setOrigin(0, 1);
     }

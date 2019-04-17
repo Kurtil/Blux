@@ -12,7 +12,7 @@ export default class DiePLayerState implements PlayerState {
     init() {
         this.player.anims.play("die");
         this.player.once("animationcomplete-die", (animation, frame) => {
-            if (frame.isLast) this.player.onDead();
+            if (frame.isLast) this.player.isDead = true;
         });
     }
 

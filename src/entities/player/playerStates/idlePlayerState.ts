@@ -1,10 +1,6 @@
 import PlayerState from "./playerState";
-import PlayerCommands from "../playerCommands";
 import Player from "../player";
-import AirPlayerState from "./airPlayerState";
-import RunPlayerState from "./runPlayerState";
-import AttackPLayerState from "./attackPlayerState";
-import MeleeAttackPlayerState from "./meleeAttackPlayerState";
+import PlayerCommands from "../playerCommands";
 
 export default class IdlePlayerState implements PlayerState {
     player: Player = null;
@@ -19,29 +15,29 @@ export default class IdlePlayerState implements PlayerState {
 
     update(time) {
         if (!this.player.body.blocked.down && !this.player.body.touching.down) {
-            this.nextState(new AirPlayerState(this.player));
+            this.nextState(this.player.states.air);
         }
     }
 
     handleUserInputs(commandes: PlayerCommands, time) {
         if (commandes.up) {
-            if (this.player.jump(time)) return this.nextState(new AirPlayerState(this.player));
+            if (this.player.jump(time)) return this.nextState(this.player.states.air);
         }
         if (commandes.left && !this.player.body.blocked.left) {
             this.player.setVelocityX(-this.player.speed);
             this.player.setFlipX(true);
-            return this.nextState(new RunPlayerState(this.player));
+            return this.nextState(this.player.states.run);
         } else if (commandes.right && !this.player.body.blocked.right) {
             this.player.setVelocityX(this.player.speed);
             this.player.setFlipX(false);
-            return this.nextState(new RunPlayerState(this.player));
+            return this.nextState(this.player.states.run);
         }
-        if (commandes.attack) {
-            return this.nextState(new AttackPLayerState(this.player));
+        if (commandes.rangedAttack) {
+            return this.nextState(this.player.states.rangedAttack);
         }
 
-        if (this.player.weapon && commandes.meleeAttack && this.player.meleeAttackAvailable) {
-            return this.nextState(new MeleeAttackPlayerState(this.player));
+        if (commandes.meleeAttack && this.player.meleeAttackAvailable) {
+            return this.nextState(this.player.states.meleeAttack);
         }
     }
 

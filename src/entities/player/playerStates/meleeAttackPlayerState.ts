@@ -1,6 +1,6 @@
 import PlayerState from "./playerState";
 import Player from "../player";
-import AirPlayerState from "./airPlayerState";
+import PlayerCommands from "../playerCommands";
 
 export default class MeleeAttackPlayerState implements PlayerState {
 
@@ -25,9 +25,13 @@ export default class MeleeAttackPlayerState implements PlayerState {
     }
 
     init() {
-        this.hitPower = this.player.weapon.hitPower;
+        this.hitPower = this.player.meleeWeapon.hitPower;
 
-        this.player.meleeAttack();
+        this.player.anims.play("meleeAttack");
+        this.player.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 200 - 100 });
+        // TODO implement a better dash (ex : in the air, no FLYING)
+        // this.scene.physics.moveTo(this, this.flipX ? this.x - this.width * 2 : this.x + this.width * 2,
+        //     this.y, 200, 100);
 
         this.weaponDeltaX = 5;
         this.weaponDeltaY = - 2;
@@ -35,7 +39,11 @@ export default class MeleeAttackPlayerState implements PlayerState {
 
         this.player.on("animationupdate-meleeAttack", (animation, frame) => {
             switch (frame.index) {
-                // case 1 never happens in update if not looping animation
+                case 1:
+                    this.weaponDeltaX = 5;
+                    this.weaponDeltaY = 1;
+                    this.weaponAngle = 65;
+                    break;
                 case 2:
                     this.weaponDeltaX = 5;
                     this.weaponDeltaY = 1;
@@ -46,18 +54,21 @@ export default class MeleeAttackPlayerState implements PlayerState {
                     this.weaponDeltaY = 0;
                     this.weaponAngle = 60;
                     break;
-                default:
-                    this.weaponDeltaX = 5;
-                    this.weaponDeltaY = 1;
-                    this.weaponAngle = 65;
             }
         });
 
         this.player.once("animationcomplete-meleeAttack", () => {
-            this.nextState(new AirPlayerState(this.player));
+            this.nextState(this.player.states.air);
         });
 
-        this.hitbox = this.addMeleeHitBox();
+        this.hitbox = this.addMeleeHitBox(
+            this.player.flipX ?
+                this.player.x + this.weaponDeltaX - 10 :
+                this.player.x + this.weaponDeltaX + 10,
+            this.player.y + this.weaponDeltaY - 10,
+            16,
+            5,
+            this.hitPower);
 
         this.updateWeaponDisplay();
     }
@@ -69,7 +80,7 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.updateWeapon();
     }
 
-    handleUserInputs(commandes, time) {
+    handleUserInputs(commandes: PlayerCommands, time) {
         const onSomething = this.player.body.touching.down || this.player.body.blocked.down;
 
         if (commandes.left) {
@@ -90,7 +101,6 @@ export default class MeleeAttackPlayerState implements PlayerState {
 
     nextState(nextState) {
         this.hitbox.destroy();
-        this.player.meleeAttacking = false;
         this.player.removeListener("animationupdate-meleeAttack");
         this.player.setAndInitCurrentState(nextState);
     }
@@ -103,9 +113,10 @@ export default class MeleeAttackPlayerState implements PlayerState {
     }
 
     private updateWeaponDisplay() {
-        this.player.updadeWeapon(
+        this.player.updadeMeleeWeapon(
             this.player.x + this.weaponDeltaX,
             this.player.y + this.weaponDeltaY,
+            this.player.flipX,
             this.weaponAngle);
     }
 
@@ -114,14 +125,23 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.updateHitBox();
     }
 
-    private addMeleeHitBox(): Phaser.GameObjects.Rectangle {
-        return this.player.addMeleeHitBox(
-            this.player.flipX ?
-                this.player.x + this.weaponDeltaX - 10 :
-                this.player.x + this.weaponDeltaX + 10,
-            this.player.y + this.weaponDeltaY - 10,
-            16,
-            5,
-            this.hitPower);
+    private addMeleeHitBox(x, y, width, height, hitPower = 1) {
+        const hitbox = this.player.scene.add.rectangle(x, y, width, height);
+        this.player.scene.physics.world.enableBody(hitbox);
+        (hitbox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+
+        this.player.shotGroup.add(hitbox);
+        (hitbox as any).hit = () => {
+            if (hitPower > 0) {
+                // a hit can hit only once will all its power
+                this.player.scene.sound.play("meleeHit", { volume: 0.2, detune: Phaser.Math.Between(-500, 500) });
+                const power = hitPower;
+                hitPower = 0;
+                return power;
+            } else {
+                return 0;
+            }
+        };
+        return hitbox;
     }
 }

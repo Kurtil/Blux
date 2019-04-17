@@ -5,29 +5,27 @@ import State from "./playerStates/playerState";
 import IdlePlayerState from "./playerStates/idlePlayerState";
 import PlayerCommands from "./playerCommands";
 import DiePLayerState from "./playerStates/diePlayerState";
-import PlayerShot from "./playerShot";
-import Sword from "../sword";
+import Sword from "../swords/sword";
 import AirPlayerState from "./playerStates/airPlayerState";
 import RunPlayerState from "./playerStates/runPlayerState";
 import MeleeAttackPlayerState from "./playerStates/meleeAttackPlayerState";
+import RangedAttackPLayerState from "./playerStates/rangedAttackPlayerState";
+import PlayerShot from "./playerShot";
 
 export default class Player extends Entity {
+
+    scene: Phaser.Scene = null;
 
     states = {
         idle: new IdlePlayerState(this),
         run: new RunPlayerState(this),
         air: new AirPlayerState(this),
-        melee: new MeleeAttackPlayerState(this),
+        meleeAttack: new MeleeAttackPlayerState(this),
+        rangedAttack: new RangedAttackPLayerState(this),
         die: new DiePLayerState(this),
     };
 
     currentState: State = null;
-
-    cursors: Phaser.Input.Keyboard.CursorKeys = null;
-    xKey: Phaser.Input.Keyboard.Key = null;
-
-    shotGroup: Phaser.GameObjects.Group = null;
-    shotPower = 1;
 
     speed = 140;
     airSpeed = 120;
@@ -36,69 +34,64 @@ export default class Player extends Entity {
     jumpDelay = 200;
     lastJumpTime = 0;
 
-    dying = false;
-    isDead = false;
+    _isDead = false;
+    get isDead() {
+        return this._isDead;
+    }
+    set isDead(value) {
+        if (value) this.scene.cameras.main.shake(250, 0.005);
+        this._isDead = value;
+    }
+
+    get dying() { return this.currentState === this.states.die; }
+
     health = 3;
     maxHealth = 3;
 
     invincible = false;
     hitLimitTime = 400;
 
-    score = 0;
+    score = 0; // TODO score may be externalized
 
-    weapon: Sword = null;
-    meleeAttacking = false;
+    rangedWeapon = PlayerShot;
+    shotGroup: Phaser.GameObjects.Group = null;
+    shotPower = 1;
+    shotSpeed = 200;
+
+    meleeWeapon: Sword = null;
+    get meleeAttacking() { return this.currentState === this.states.meleeAttack; }
     meleeAttackAvailable = true;
     meleeAttackSpeed = 300;
     lastMeleeAttack: number = null;
 
     constructor(scene: MainScene, x, y, key) {
         super(scene, x, y, key, "Player");
-
-        this.setSize(10, 15).setOffset(3, 1).setDragX(100);
-
-        this.cursors = this.scene.input.keyboard.createCursorKeys();
-
-        this.setDepth(1);
+        this.scene = scene;
+        this.shotGroup = this.scene.add.group();
 
         this.createAnimations();
-        this.shotGroup = this.scene.add.group();
+
+        this.setSize(10, 15).setOffset(3, 1).setDragX(100).setDepth(1);
+
         this.currentState = this.states.idle;
     }
 
-    update(time: number) {
-        if (this.isOutOfBounds()) {
-            this.onDead();
-        } else {
-            if (this.health <= 0) {
-                this.onDying();
-            } else {
-                // Alive state lies here
-                if (time - this.lastMeleeAttack > this.meleeAttackSpeed) {
-                    this.meleeAttackAvailable = true;
-                }
-                if (!this.meleeAttacking) {
-                    this.updadeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, 135);
-                }
-                this.currentState.update(time);
-                this.currentState.handleUserInputs(this.parseUserInput(this.cursors), time);
-            }
-        }
-    }
+    update(time: number, commandes: PlayerCommands) {
+        this.isDead = this.isOutOfBounds();
+        if (this.isDead) return;
 
-    /**
-     * Jump if the previous jump was not to close in time
-     * @param time the current time
-     * @return true if the jump was performed
-     */
-    jump(time): boolean {
-        if (time - this.lastJumpTime > this.jumpDelay) {
-            this.setVelocityY(-this.jumpPower);
-            this.scene.sound.play("playerJump", { detune: Math.random() * 50 - 25 });
-            this.lastJumpTime = time;
-            return true;
+        this.meleeAttackAvailable = time - this.lastMeleeAttack > this.meleeAttackSpeed;
+        if (!this.meleeAttacking && this.meleeWeapon) {
+            this.updadeMeleeWeapon(this.x - (this.flipX ? -2 : 2), this.y - 16, this.flipX, 135);
+        }
+
+        if (this.dying) return;
+
+        if (this.health <= 0) {
+            this.currentState.nextState(this.states.die);
         } else {
-            return false;
+            this.currentState.update(time);
+            this.currentState.handleUserInputs(this.parseUserInput(commandes), time);
         }
     }
 
@@ -112,12 +105,13 @@ export default class Player extends Entity {
             this.scene.cameras.main.shake(100, 0.001);
             this.scene.sound.play("playerHit", { volume: 0.5 });
             if (this.health > 0) {
-                this.setInvincibility();
+                this.setTemporaryInvincibility(this.hitLimitTime);
             }
         }
     }
 
     /**
+     * The facade used to affect the player with effects
     * @param effect the effect that will (probably) affect the player
     * @returns true if the effect affected the player, false if no effect
     */
@@ -136,38 +130,44 @@ export default class Player extends Entity {
             affected = true;
         }
         if (weapon) {
-            this.equip(new weapon(this.scene, this.x, this.y, spriteSheetConfig.name));
-            affected = true;
+            affected = this.equip(new weapon(this.scene, this.x, this.y, spriteSheetConfig.name));
         }
         return affected;
     }
 
-    attack(): any {
-        this.shotGroup.add(new PlayerShot(this.scene as MainScene, this.x, this.y,
-            spriteSheetConfig.name, this, this.shotPower));
-        this.scene.sound.play("playerAttack", { detune: Math.random() * 50 - 25 });
+    updadeMeleeWeapon(x, y, flipX, angle) {
+        this.meleeWeapon.setX(x);
+        this.meleeWeapon.setY(y);
+        this.meleeWeapon.setFlipX(flipX);
+        this.meleeWeapon.setAngle(angle);
     }
 
-    meleeAttack() {
-        this.meleeAttacking = true;
-        this.anims.play("meleeAttack");
-        this.scene.sound.play("meleeAttack", { volume: 0.3, detune: Math.random() * 200 - 100 });
-        // TODO implement a better dash (ex : in the air, no FLYING)
-        // this.scene.physics.moveTo(this, this.flipX ? this.x - this.width * 2 : this.x + this.width * 2,
-        //     this.y, 200, 100);
+    /**
+     * Jump if the previous jump was not to close in time
+     * @param time the current time
+     * @return true if the jump was performed
+     */
+    jump(time): boolean {
+        let jumped = false;
+        if (this.jumpAvailable(time)) {
+            this.setVelocityY(-this.jumpPower);
+            this.scene.sound.play("playerJump", { detune: Math.random() * 50 - 25 });
+            this.lastJumpTime = time;
+            jumped = true;
+        }
+        return jumped;
     }
 
-    onDead(): any {
-        this.scene.cameras.main.shake(250, 0.005);
-        this.isDead = true;
+    private jumpAvailable(time: number): boolean {
+        return time - this.lastJumpTime > this.jumpDelay;
     }
 
-    private setInvincibility() {
+    private setTemporaryInvincibility(duration: number) {
         this.invincible = true;
         const repeatTime = 3;
         this.scene.tweens.add({
             targets: this,
-            duration: this.hitLimitTime / repeatTime,
+            duration: duration / repeatTime,
             alpha: 0,
             onComplete() {
                 this.invincible = false;
@@ -178,62 +178,21 @@ export default class Player extends Entity {
         });
     }
 
-    updadeWeapon(x, y, angle) {
-        if (this.weapon) {
-            this.weapon.setX(x);
-            this.weapon.setY(y);
-            this.weapon.setFlipX(this.flipX);
-            this.weapon.setAngle(angle);
-        }
-    }
-
-    addMeleeHitBox(x, y, width, height, hitPower = 1) {
-        const hitbox = this.scene.add.rectangle(x, y, width, height);
-        this.scene.physics.world.enableBody(hitbox);
-        (hitbox.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
-
-        this.shotGroup.add(hitbox);
-        (hitbox as any).hit = () => {
-            if (hitPower > 0) {
-                // a hit can hit only once will all its power
-                this.meleeAttackSound();
-                const power = hitPower;
-                hitPower = 0;
-                return power;
-            } else {
-                return 0;
-            }
-        };
-        return hitbox;
-    }
-
-    meleeAttackSound(): any {
-        this.scene.sound.play("meleeHit", { volume: 0.2, detune: Phaser.Math.Between(-500, 500) });
-    }
-
     /**
      * Update health of the player if possible
      * @param amount the amount to change
      * @return true if health changed
      */
     private updateHealth(amount): boolean {
-        if (amount > 0) {
-            if (this.health < this.maxHealth) {
-                this.health = Math.min(this.health + amount, this.maxHealth);
-                return true;
-            } else {
-                return false;
-            }
-        } else if (amount < 0) {
-            if (!this.invincible) {
-                this.health += amount;
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
+        let healthUpdated = false;
+        if (amount > 0 && this.health < this.maxHealth) {
+            this.health = Math.min(this.health + amount, this.maxHealth);
+            healthUpdated = true;
+        } else if (amount < 0 && !this.invincible) {
+            this.health += amount;
+            healthUpdated = true;
         }
+        return healthUpdated;
     }
 
     private updateMaxHealth(maxHealthChange) {
@@ -247,33 +206,29 @@ export default class Player extends Entity {
         }
     }
 
-    private equip(weapon): any {
-        if (this.weapon) {
-            this.weapon.destroy();
+    private equip(weapon): boolean {
+        let equiped = false;
+        if (true) { // TODO if player want to equipe. ex : lower power sword... ?
+            if (this.meleeWeapon) {
+                this.meleeWeapon.destroy();
+            }
+            this.meleeWeapon = weapon;
+            equiped = true;
         }
-        this.weapon = weapon;
+        return equiped;
     }
 
-    private isOutOfBounds(): any {
+    private isOutOfBounds(): boolean {
         return this.x > (<MainScene>this.scene).map.width * (<MainScene>this.scene).map.tileWidth ||
             this.x < 0 ||
             this.y > (<MainScene>this.scene).map.height * (<MainScene>this.scene).map.tileHeight;
     }
 
-    private onDying() {
-        if (!this.dying) {
-            this.setAndInitCurrentState(this.states.die);
-            this.dying = true;
-        }
-    }
-
-    private parseUserInput(cursors: Phaser.Input.Keyboard.CursorKeys): PlayerCommands {
+    private parseUserInput(commandes: PlayerCommands): PlayerCommands {
         return {
-            up: cursors.up.isDown,
-            right: cursors.right.isDown,
-            left: cursors.left.isDown,
-            meleeAttack: cursors.space.isDown,
-            attack: cursors.down.isDown,
+            ...commandes,
+            meleeAttack: commandes.meleeAttack && !!this.meleeWeapon,
+            rangedAttack: commandes.rangedAttack && !!this.rangedWeapon,
         };
     }
 

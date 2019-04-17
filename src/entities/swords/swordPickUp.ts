@@ -1,7 +1,5 @@
-import spriteSheetConfig from "../../assets/spriteSheets/spriteSheet.json";
-import Entity from "./entity";
-import PickUp from "./pickup";
-import Sword from "./sword";
+import Entity from "../entity";
+import PickUp from "../pickup";
 
 export default class SwordPickUp extends Entity implements PickUp {
 
