@@ -1,9 +1,6 @@
 import PlayerState from "./playerState";
 import PlayerCommands from "../playerCommands";
 import Player from "../player";
-import RunPlayerState from "./runPlayerState";
-import IdlePlayerState from "./idlePlayerState";
-import MeleeAttackPlayerState from "./meleeAttackPlayerState";
 
 export default class AirPlayerState implements PlayerState {
     player: Player = null;
@@ -11,6 +8,8 @@ export default class AirPlayerState implements PlayerState {
     constructor(player: Player) {
         this.player = player;
     }
+
+    init() { }
 
     update(time): void {
         if (this.player.body.velocity.y > 0) {
@@ -20,9 +19,9 @@ export default class AirPlayerState implements PlayerState {
         }
         if (this.player.body.blocked.down || this.player.body.touching.down) {
             if (this.player.body.velocity.x === 0) {
-                return this.nextState(new IdlePlayerState(this.player));
+                return this.nextState(this.player.states.idle);
             } else {
-                return this.nextState(new RunPlayerState(this.player));
+                return this.nextState(this.player.states.run);
             }
         }
     }
@@ -40,11 +39,11 @@ export default class AirPlayerState implements PlayerState {
         }
 
         if (this.player.weapon && commandes.meleeAttack && this.player.meleeAttackAvailable) {
-            return this.nextState(new MeleeAttackPlayerState(this.player));
+            return this.nextState(this.player.states.melee);
         }
     }
 
     nextState(nextState) {
-        this.player.setCurrentState(nextState);
+        this.player.setAndInitCurrentState(nextState);
     }
 }

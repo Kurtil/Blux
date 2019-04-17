@@ -9,19 +9,19 @@ export default class AttackPLayerState implements PlayerState {
 
     constructor(player: Player) {
         this.player = player;
+    }
+
+    init() {
         this.player.anims.play("attack");
         this.player.on("animationupdate-attack", (animation, frame) => {
             if (frame.textureFrame === 32) this.player.attack();
         });
     }
 
-    update(time): void {
-
-    }
+    update(time): void { }
 
     handleUserInputs(commandes: PlayerCommands) {
         if (!commandes.attack) {
-            this.player.removeListener("animationupdate-attack");
             return this.nextState(new IdlePlayerState(this.player));
         }
 
@@ -31,6 +31,7 @@ export default class AttackPLayerState implements PlayerState {
     }
 
     nextState(nextState) {
-        this.player.setCurrentState(nextState);
+        this.player.removeListener("animationupdate-attack");
+        this.player.setAndInitCurrentState(nextState);
     }
 }

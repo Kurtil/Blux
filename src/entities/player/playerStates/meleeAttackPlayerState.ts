@@ -21,8 +21,10 @@ export default class MeleeAttackPlayerState implements PlayerState {
     }
 
     constructor(player: Player) {
-
         this.player = player;
+    }
+
+    init() {
         this.hitPower = this.player.weapon.hitPower;
 
         this.player.meleeAttack();
@@ -90,7 +92,7 @@ export default class MeleeAttackPlayerState implements PlayerState {
         this.hitbox.destroy();
         this.player.meleeAttacking = false;
         this.player.removeListener("animationupdate-meleeAttack");
-        this.player.setCurrentState(nextState);
+        this.player.setAndInitCurrentState(nextState);
     }
 
     private updateHitBox() {

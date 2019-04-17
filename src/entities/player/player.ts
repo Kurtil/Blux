@@ -7,12 +7,24 @@ import PlayerCommands from "./playerCommands";
 import DiePLayerState from "./playerStates/diePlayerState";
 import PlayerShot from "./playerShot";
 import Sword from "../sword";
+import AirPlayerState from "./playerStates/airPlayerState";
+import RunPlayerState from "./playerStates/runPlayerState";
+import MeleeAttackPlayerState from "./playerStates/meleeAttackPlayerState";
 
 export default class Player extends Entity {
 
+    states = {
+        idle: new IdlePlayerState(this),
+        run: new RunPlayerState(this),
+        air: new AirPlayerState(this),
+        melee: new MeleeAttackPlayerState(this),
+        die: new DiePLayerState(this),
+    };
+
+    currentState: State = null;
+
     cursors: Phaser.Input.Keyboard.CursorKeys = null;
     xKey: Phaser.Input.Keyboard.Key = null;
-    currentState: State = null;
 
     shotGroup: Phaser.GameObjects.Group = null;
     shotPower = 1;
@@ -51,7 +63,7 @@ export default class Player extends Entity {
 
         this.createAnimations();
         this.shotGroup = this.scene.add.group();
-        this.currentState = new IdlePlayerState(this);
+        this.currentState = this.states.idle;
     }
 
     update(time: number) {
@@ -90,8 +102,9 @@ export default class Player extends Entity {
         }
     }
 
-    setCurrentState(state: State): void {
+    setAndInitCurrentState(state: State): void {
         this.currentState = state;
+        this.currentState.init();
     }
 
     onHit(power = 1) {
@@ -249,7 +262,7 @@ export default class Player extends Entity {
 
     private onDying() {
         if (!this.dying) {
-            this.setCurrentState(new DiePLayerState(this));
+            this.setAndInitCurrentState(this.states.die);
             this.dying = true;
         }
     }

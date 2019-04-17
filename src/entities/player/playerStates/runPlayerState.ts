@@ -10,6 +10,9 @@ export default class RunPlayerState implements PlayerState {
 
     constructor(player: Player) {
         this.player = player;
+    }
+
+    init() {
         this.player.anims.play("walk");
     }
 
@@ -41,6 +44,6 @@ export default class RunPlayerState implements PlayerState {
     }
 
     nextState(nextState) {
-        this.player.setCurrentState(nextState);
+        this.player.setAndInitCurrentState(nextState);
     }
 }
