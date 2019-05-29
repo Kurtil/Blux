@@ -12,6 +12,7 @@ import SwordPickUp from "../entities/swords/swordPickUp";
 import Sword from "../entities/swords/sword";
 import ForrestSword from "../entities/swords/forrestSword";
 import HellSword from "../entities/swords/hellSword";
+import StoneSword from "../entities/swords/stoneSword";
 import PlayerCommands from "../entities/player/playerCommands.js";
 
 export default class MainScene extends Phaser.Scene {
@@ -76,12 +77,12 @@ export default class MainScene extends Phaser.Scene {
         // Pickup management
         this.pickupGroup = this.add.group();
         this.pickupGroup.addMultiple((new GemFactory(this, spriteSheetConfig.name)).generateGemsFromMap(this.map));
-        const sword: any = this.map.findObject("weapons", obj => obj.name === "sword");
+        const stoneSword: any = this.map.findObject("weapons", obj => obj.name === "stoneSword");
         const forrestSword: any = this.map.findObject("weapons", obj => obj.name === "forrestSword");
         const hellSword: any = this.map.findObject("weapons", obj => obj.name === "hellSword");
         this.pickupGroup.addMultiple([
-            new SwordPickUp(this, sword.x + 8, sword.y - 8, spriteSheetConfig.name,
-                spriteSheetConfig.content.sword.frame, Sword),
+            new SwordPickUp(this, stoneSword.x + 8, stoneSword.y - 8, spriteSheetConfig.name,
+                spriteSheetConfig.content.stoneSword.frame, StoneSword),
             new SwordPickUp(this, forrestSword.x + 8, forrestSword.y - 8, spriteSheetConfig.name,
                 spriteSheetConfig.content.forrestSword.frame, ForrestSword),
             new SwordPickUp(this, hellSword.x + 8, hellSword.y - 8, spriteSheetConfig.name,
