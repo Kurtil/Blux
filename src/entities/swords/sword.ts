@@ -2,10 +2,11 @@ import spriteSheetConfig from "../../../assets/spriteSheets/spriteSheet.json";
 
 export default class Sword extends Phaser.Physics.Arcade.Sprite {
 
-    hitPower = 1;
+    hitPower = null;
 
-    constructor(scene: Phaser.Scene, x, y, key) {
-        super(scene, x, y, key, spriteSheetConfig.content.sword.frame);
+    constructor(scene: Phaser.Scene, x, y, key, sprite: number, hitPower: number) {
+        super(scene, x, y, key, sprite);
+        this.hitPower = hitPower;
         this.scene.add.existing(this);
         this.setOrigin(0, 1);
     }

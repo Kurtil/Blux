@@ -1,29 +1,10 @@
 import spriteSheetConfig from "../../../assets/spriteSheets/spriteSheet.json";
+import Sword from './sword'
 
-export default class ForrestSword extends Phaser.Physics.Arcade.Sprite {
-
-    hitPower = 2;
-
+export default class ForrestSword extends Sword {
     constructor(scene: Phaser.Scene, x, y, key) {
-        super(scene, x, y, key, spriteSheetConfig.content.forrestSword.frame);
+        super(scene, x, y, key, spriteSheetConfig.content.forrestSword.frame, 2);
         this.scene.add.existing(this);
         this.setOrigin(0, 1);
-    }
-
-    setFlipX(value) {
-        this.setDirectionOrigin(value);
-        return super.setFlipX(value);
-    }
-
-    setDirectionOrigin(leftDirection) {
-        if (leftDirection) {
-            this.setOrigin(1, 1);
-        } else {
-            this.setOrigin(0, 1);
-        }
-    }
-
-    setAngle(value) {
-        return super.setAngle(this.flipX ? - value : value);
     }
 }
